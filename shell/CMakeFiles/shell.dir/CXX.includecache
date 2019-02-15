@@ -2229,6 +2229,8 @@ iostream
 -
 SimpleCommand.h
 /home/jeroen/Compilers-Operating-Systems/shell/src/SimpleCommand.h
+zconf.h
+-
 
 /home/jeroen/Compilers-Operating-Systems/shell/src/SimpleCommand.h
 vector
@@ -2255,6 +2257,8 @@ CommandVisitor.h
 /home/jeroen/Compilers-Operating-Systems/shell/src/CommandVisitor.h
 Sequence.h
 /home/jeroen/Compilers-Operating-Systems/shell/src/Sequence.h
+unistd.h
+-
 
 runtime/src/ANTLRErrorListener.h
 RecognitionException.h

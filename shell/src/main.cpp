@@ -6,6 +6,7 @@
 #include "../gen/ShellGrammarParser.h"
 #include "CommandVisitor.h"
 #include "Sequence.h"
+#include <unistd.h>
 
 class ErrorListener : public antlr4::BaseErrorListener {
 	bool seenError;
@@ -27,23 +28,15 @@ public:
 };
 
 int main() {
-	static const char *PROMPT = "-> ";
 	while( true ) {
 		// Print a prompt
-		std::cout << PROMPT;
+		std::cout << getcwd(NULL, NULL) << " -> ";
 		std::flush(std::cout);
 
 		// Read a complete line
 		std::string line;
 		std::getline(std::cin, line);
 
-		// Check if the user typed 'exit'.
-		// Now this is a bit of a hack, since the nice way to do this is actually
-		// just check for 'exit' in the SimpleCommand-class.
-		// You are encouraged to remove this hack and handle things 'the nice way'.
-
-		if( line == "exit" )
-			break;
 
 		// Create an error listener. This will be called when an error occured.
 		ErrorListener errorListener;
