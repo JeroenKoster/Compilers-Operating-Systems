@@ -41,6 +41,7 @@ int main() {
 		// Now this is a bit of a hack, since the nice way to do this is actually
 		// just check for 'exit' in the SimpleCommand-class.
 		// You are encouraged to remove this hack and handle things 'the nice way'.
+
 		if( line == "exit" )
 			break;
 
