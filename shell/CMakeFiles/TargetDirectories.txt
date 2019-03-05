@@ -1,7 +1,0 @@
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/edit_cache.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/slow.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/rebuild_cache.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/shell.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/errorReturn.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/printArgs.dir
-/home/jeroen/Compilers-Operating-Systems/shell/CMakeFiles/outputs.dir

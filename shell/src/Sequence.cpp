@@ -1,4 +1,5 @@
 #include <iostream>
+#include <zconf.h>
 #include "Sequence.h"
 #include "Pipeline.h"
 
@@ -19,6 +20,10 @@ void Sequence::execute() {
 
 	for( Pipeline *p : pipelines ) {
 		// FIXME: More code needed?
+        int cid = fork();
+        //fork()
+        // child = 0 exec
+        // parent < 0 waitpid op cid van fork, return
 		p->execute();
 	}
 }

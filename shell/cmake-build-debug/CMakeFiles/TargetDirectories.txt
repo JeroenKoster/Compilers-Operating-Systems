@@ -1,0 +1,7 @@
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/slow.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/printArgs.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/outputs.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/errorReturn.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/nicky/Desktop/CompilersAndOperatingSystems/Compilers-Operating-Systems/shell/cmake-build-debug/CMakeFiles/shell.dir

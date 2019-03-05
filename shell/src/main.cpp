@@ -29,6 +29,7 @@ public:
 
 int main() {
 	while( true ) {
+
 		// Print a prompt
 		std::cout << getcwd(NULL, NULL) << " -> ";
 		std::flush(std::cout);
