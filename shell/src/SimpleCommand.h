@@ -32,6 +32,8 @@ class SimpleCommand {
 		}
 
 		void execute();
+
+		std::string toString();
 };
 
 

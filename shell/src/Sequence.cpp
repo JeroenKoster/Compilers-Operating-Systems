@@ -16,11 +16,12 @@ Sequence::~Sequence() {
  * was used - waits for execution to be finished or not.
  */
 void Sequence::execute() {
-	std::cout << "FIXME: You should change Sequence::execute()" << std::endl;
+	// std::cout << "FIXME: You should change Sequence::execute()" << std::endl;
 
 	for( Pipeline *p : pipelines ) {
 		// FIXME: More code needed?
-        int cid = fork();
+        // int cid = fork();
+		
         //fork()
         // child = 0 exec
         // parent < 0 waitpid op cid van fork, return

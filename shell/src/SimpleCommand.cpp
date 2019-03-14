@@ -5,6 +5,7 @@
 #include <fcntl.h>
 
 void SimpleCommand::execute() {
+	std::cout << "Executing " << this->toString() << std::endl;
 	if(command == "cd") {
 		if (arguments.empty()) { // If no path provided, set path to home
 			addArgument(getenv("HOME"));
@@ -20,9 +21,6 @@ void SimpleCommand::execute() {
 		std::cout << "Program stopping" << std::endl;
 		exit(0);
 	} else {
-		std::cout << "Executing program..." << std::endl;
-        std::cout << command << std::endl;
-
         char *args[arguments.size() +2];
 
         args[0] = const_cast<char *>(command.c_str());
@@ -42,8 +40,8 @@ void SimpleCommand::execute() {
             int fd = open(red.getNewFile().c_str(), O_WRONLY | O_CREAT, 0644);
             if (fd < 0) throw std::invalid_argument("open error");
 
-            dup2(fd, 1); // send output to new 'file'
-            close(fd);
+            dup2(fd, 1); // send output to new 'file' and close stdout
+            close(fd); // close file
         }
 
         execvp(args[0], args);
@@ -55,10 +53,16 @@ void SimpleCommand::execute() {
 	}
 
 	// Just for debugging
-	int counter = 0;
-	std::cout << "ARGUMENTS: " << std::endl;
-	for(auto const& arg: arguments) {
-		std::cout << "  arg[" << counter << "]: " << arg << std::endl;
-		counter++;
-	}
+	// int counter = 0;
+	// std::cout << "ARGUMENTS: " << std::endl;
+	// for(auto const& arg: arguments) {
+	// 	std::cout << "  arg[" << counter << "]: " << arg << std::endl;
+	// 	counter++;
+	// }
+}
+
+
+
+std::string SimpleCommand::toString() {
+	return command;
 }

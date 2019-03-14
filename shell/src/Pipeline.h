@@ -30,6 +30,10 @@ class Pipeline {
 		void addCommand( SimpleCommand *cmd ) { commands.push_back(cmd); }
 
 		void execute();
+
+        // Pipe ends for better readability
+        const int PIPE_READ = 0;
+        const int PIPE_WRITE = 1;
 };
 
 
