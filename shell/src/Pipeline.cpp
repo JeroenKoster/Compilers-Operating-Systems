@@ -33,10 +33,8 @@ void Pipeline::execute() {
 				pipe(fd);
 			}
 			pid = fork();
-			std::cout << "Command: " << cmd->toString() << ", Pid: " << pid << ", counter: " << counter << std::endl;
+			// std::cout << "Command: " << cmd->toString() << ", Pid: " << pid << ", counter: " << counter << std::endl;
 			if (pid == 0) { // Huidge process is child process
-				// dup2(fd[PIPE_WRITE], STDOUT_FILENO);
-				// close(fd[PIPE_WRITE]);
 				if (counter != 0) {
 					dup2(storedReadSide, STDIN_FILENO);
 					close(storedReadSide);
@@ -58,5 +56,8 @@ void Pipeline::execute() {
 			}
 			counter++;
 		}
+	}
+	if (pid > 0) {
+		waitpid(pid, 0, 0);
 	}
 }

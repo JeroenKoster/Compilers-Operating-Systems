@@ -51,14 +51,6 @@ void SimpleCommand::execute() {
         // if path: execute program from PATH variable (contains directories such as /usr/bin)
 
 	}
-
-	// Just for debugging
-	// int counter = 0;
-	// std::cout << "ARGUMENTS: " << std::endl;
-	// for(auto const& arg: arguments) {
-	// 	std::cout << "  arg[" << counter << "]: " << arg << std::endl;
-	// 	counter++;
-	// }
 }
 
 
