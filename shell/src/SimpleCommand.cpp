@@ -5,7 +5,7 @@
 #include <fcntl.h>
 
 void SimpleCommand::execute() {
-	std::cout << "Executing " << this->toString() << std::endl;
+	// std::cout << "Executing " << this->toString() << std::endl;
 	if(command == "cd") {
 		if (arguments.empty()) { // If no path provided, set path to home
 			addArgument(getenv("HOME"));
@@ -44,7 +44,9 @@ void SimpleCommand::execute() {
             close(fd); // close file
         }
 
+        printf("%d executing and exiting", getpid());
         execvp(args[0], args);
+        exit(0);
 
         //Execute programs
         // if no path: execute program in current working directory by ./

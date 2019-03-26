@@ -21,22 +21,28 @@ void Sequence::execute() {
 	// std::cout << "FIXME: You should change Sequence::execute()" << std::endl;
 
 	int counter = 0;
-	printf("Count: %i\n", pipelines.size());
 	for( Pipeline *p : pipelines ) {
 		// FIXME: More code needed?
-		printf("Pipeline %i async: %i\n", counter, p->isAsync());
+		// printf("Pipeline %i async: %i\n", counter, p->isAsync());
         int cid = fork();
-		counter++;
 		if (cid == 0) {
+			// printf("%d executing pipeline %d\n", getpid(), counter);
 			p->execute();
 		} 
-		else if (cid > 0 && !p->isAsync()) {
-			printf("Waiting for %i\n", cid);
-			waitpid(cid,0,0);
-			printf("Done waiting");
+		else if (cid > 0) {
+			if (!p->isAsync()) {
+				// printf("Waiting for %i\n", cid);
+				waitpid(cid, NULL, 0);
+				// printf("Done waiting\n");
+			}
+		} else {
+			printf("ERROR: pid < 0 in pipeline %d\n", counter);
 		}
+		counter++;
+
         // child = 0 exec
         // parent < 0 waitpid op cid van fork, return
-		
 	}
+	std::cout << getcwd(NULL, NULL) << " -> ";
+	std::flush(std::cout);
 }

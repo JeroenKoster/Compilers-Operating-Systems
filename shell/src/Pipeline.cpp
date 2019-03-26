@@ -24,9 +24,10 @@ void Pipeline::execute() {
 	for( SimpleCommand *cmd : commands ) {
 		
 		if (commands.size() == 1) {
-			if (fork() == 0) {
+			// if (fork() == 0) {
 				cmd->execute();
-			}
+				exit(1);
+			// }
 		} 
 		else {
 			if (counter != commands.size() - 1) {
@@ -54,10 +55,22 @@ void Pipeline::execute() {
 					close(fd[PIPE_WRITE]);
 				}
 			}
-			counter++;
-		}
+		}				
+		counter++;
 	}
-	if (pid > 0) {
-		waitpid(pid, 0, 0);
-	}
+	waitpid(pid, NULL, 0);
+	// printf("pipeline finished, exiting %d\n", getpid());
+	exit(0);
 }
+
+	// if (counter == commands.size() && pid > 0) {
+	// 	printf("waiting");
+	// 	wait(NULL);
+	// 	printf("Parent process finished\n");
+
+		
+	// 	// Print a prompt
+	// 	std::cout << getcwd(NULL, NULL) << " -> ";
+	// 	std::flush(std::cout);
+
+	// }
