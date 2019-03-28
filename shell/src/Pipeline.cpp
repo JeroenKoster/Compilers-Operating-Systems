@@ -16,7 +16,6 @@ Pipeline::~Pipeline() {
  * Executes the commands on this pipeline.
  */
 void Pipeline::execute() {
-	// std::cout << "Pipeline::execute()" << std::endl;
 	int counter = 0;
 	int fd[2];
 	int pid;
@@ -24,18 +23,17 @@ void Pipeline::execute() {
 	for( SimpleCommand *cmd : commands ) {
 		
 		if (commands.size() == 1) {
-			// if (fork() == 0) {
-				cmd->execute();
-				exit(1);
-			// }
+			cmd->execute();
+			exit(EXIT_SUCCESS);
 		} 
 		else {
 			if (counter != commands.size() - 1) {
-				pipe(fd);
+				if (pipe(fd) == -1) {
+					perror("ERROR: creating pipe failed");
+				};
 			}
 			pid = fork();
-			// std::cout << "Command: " << cmd->toString() << ", Pid: " << pid << ", counter: " << counter << std::endl;
-			if (pid == 0) { // Huidge process is child process
+			if (pid == 0) { // Current process == child process
 				if (counter != 0) {
 					dup2(storedReadSide, STDIN_FILENO);
 					close(storedReadSide);
@@ -46,7 +44,8 @@ void Pipeline::execute() {
 					close(fd[PIPE_WRITE]);
 				}
 				cmd->execute();
-			} else {
+				exit(0);
+			} else if(pid > 0) { // Current process == parent process
 				if (counter != 0) {
 					close(storedReadSide);
 				} 
@@ -54,23 +53,13 @@ void Pipeline::execute() {
 					storedReadSide = fd[PIPE_READ];
 					close(fd[PIPE_WRITE]);
 				}
+			} else {
+				perror("ERROR: Invalid pid after forking");
 			}
 		}				
 		counter++;
 	}
 	waitpid(pid, NULL, 0);
-	// printf("pipeline finished, exiting %d\n", getpid());
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
-	// if (counter == commands.size() && pid > 0) {
-	// 	printf("waiting");
-	// 	wait(NULL);
-	// 	printf("Parent process finished\n");
-
-		
-	// 	// Print a prompt
-	// 	std::cout << getcwd(NULL, NULL) << " -> ";
-	// 	std::flush(std::cout);
-
-	// }

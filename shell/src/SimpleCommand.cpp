@@ -5,27 +5,26 @@
 #include <fcntl.h>
 
 void SimpleCommand::execute() {
-	// std::cout << "Executing " << this->toString() << std::endl;
 	if(command == "cd") {
-		if (arguments.empty()) { // If no path provided, set path to home
+        // If no path provided, set path to home
+		if (arguments.empty()) { 
 			addArgument(getenv("HOME"));
 		}
 		const char *arg = arguments.front().c_str();
 
 		if (chdir(arg) != 0) {
-			std::cerr << "Error while changing dir" << std::endl;
+			perror("ERROR: Changing directory failed");
 		} else {
-			std::cout << "Changed working directory to: " << arg << std::endl;
+			printf("Changed working directory to: %s", arg);
 		}
-	} else if(command =="exit") { // Currently exits in main.cpp prior to reaching this
-		std::cout << "Program stopping" << std::endl;
-		exit(0);
+	} else if(command =="exit") { 
+		printf("Program stopping");
+		exit(EXIT_SUCCESS);
 	} else {
         char *args[arguments.size() +2];
 
         args[0] = const_cast<char *>(command.c_str());
         args[arguments.size() +1] = nullptr;
-
 
         int i = 1;
         for (auto const &arg: arguments) {
@@ -35,23 +34,65 @@ void SimpleCommand::execute() {
             args[i] = c;
             i++;
         }
-
+        // input output redirection
         for (auto const &red: redirects) {
-            int fd = open(red.getNewFile().c_str(), O_WRONLY | O_CREAT, 0644);
-            if (fd < 0) throw std::invalid_argument("open error");
+            printf("REDIRECTING [%d] \n", red.getType());
+            // OUTPUT type
+            if (red.getType() == red.OUTPUT) {                  
 
-            dup2(fd, 1); // send output to new 'file' and close stdout
-            close(fd); // close file
+                int fd = open(red.getNewFile().c_str(), O_WRONLY | O_CREAT, 0644);
+                if (fd < 0) {
+                    perror("ERROR: Couldn't open file to write to\n");
+                }
+
+                 // '>'  write to file
+                if (red.getOldFileDescriptor() == 1) {         
+                    printf("OUTPUT >: %i\n" , red.getOldFileDescriptor());
+
+                    dup2(fd, 1);
+                    close(fd);
+
+                // '2>' write error to file
+                } else if (red.getOldFileDescriptor() == 2) {   
+                    printf("OUTPUT 2>: %i\n", red.getOldFileDescriptor());
+                    dup2(fd, 2);
+                    close(fd);
+
+                } else {
+                    printf("OUTPUT ?: %i\n", red.getOldFileDescriptor());
+                }
+                    
+            // APPEND type
+            } else if (red.getType() == red.APPEND) {           
+                printf("APPEND >>: %i\n", red.getOldFileDescriptor());
+                int fd = open(red.getNewFile().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
+                
+                if (fd < 0) {
+                    perror("ERROR: Couldn't open file to append to\n");
+                }
+
+                dup2(fd, 1);
+                close(fd);
+
+            // INPUT type
+            } else if (red.getType() == red.INPUT) {            
+                printf("INPUT <: %i", red.getOldFileDescriptor());
+                int fd = open(red.getNewFile().c_str(), O_RDONLY, 0644);
+                
+                if (fd < 0) {
+                    perror("ERROR: Couldn't open file to read from\n");
+                }
+
+                dup2(fd, 0);
+                close(fd);
+            // UNRECOGNIZED type
+            } else {
+                perror("ERROR: Unrecognized redirection type\n");
+            }
         }
-
+        
         printf("%d executing and exiting", getpid());
         execvp(args[0], args);
-        exit(0);
-
-        //Execute programs
-        // if no path: execute program in current working directory by ./
-        // if path: execute program from PATH variable (contains directories such as /usr/bin)
-
 	}
 }
 

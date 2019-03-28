@@ -29,6 +29,10 @@ public:
 
 int main() {
 	while( true ) {
+		
+		// Print current working directory
+		std::cout << getcwd(NULL, NULL) << " -> ";
+		std::flush(std::cout);
 
 		// Read a complete line
 		std::string line;
