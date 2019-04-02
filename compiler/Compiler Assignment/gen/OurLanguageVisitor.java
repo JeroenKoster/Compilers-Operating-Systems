@@ -1,4 +1,4 @@
-// Generated from C:/Users/nicky/Desktop/Compilers/Compiler Assignment/src\OurLanguage.g4 by ANTLR 4.7.2
+// Generated from C:/Users/nicky/Desktop/Compilers/Compilers-Operating-Systems/compiler/Compiler Assignment/src\OurLanguage.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -22,11 +22,35 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(OurLanguageParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#ifStatement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfStatement(OurLanguageParser.IfStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#declaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclaration(OurLanguageParser.DeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#variableName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableName(OurLanguageParser.VariableNameContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link OurLanguageParser#printStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitPrintStatement(OurLanguageParser.PrintStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#block}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBlock(OurLanguageParser.BlockContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExNegate}
 	 * labeled alternative in {@link OurLanguageParser#expression}.

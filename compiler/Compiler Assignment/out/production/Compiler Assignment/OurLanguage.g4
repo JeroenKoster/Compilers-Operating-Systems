@@ -3,21 +3,24 @@ grammar OurLanguage;
 start: (statement*) EOF;
 
 statement
-    : printStatement ;
-//    : declaration
-//    | assignment
-//    | block
-//    ;
-//
-//declaration: variableName IDENTIFIER ';';
-//
-//variableName: ('INT' | 'STRING');
-//
-//assignment: IDENTIFIER '=' expression ';';
-//
+    : printStatement
+    | ifStatement
+    | declaration
+    | assignment
+    | block
+    ;
+
+ifStatement: 'IF' expression ('<' | '>') expression block;
+
+declaration: variableName IDENTIFIER ';';
+
+variableName: ('INT' | 'STRING');
+
+assignment: IDENTIFIER '=' expression ';';
+
 printStatement: 'PRINT' expression ';';
-//
-//block: '{' statement* '}';
+
+block: '{' expression* '}';
 
 expression
     : '(' expression ')'                                   # ExParentheses
@@ -27,6 +30,7 @@ expression
     | IDENTIFIER                                           # ExIdentifier
     | INT                                                  # ExIntLiteral
     | STRING                                               # ExStringLiteral
+//    | BOOLEAN                                              # ExBooleanLiteral
     ;
 
 INT: '0' | [1-9][0-9]*;

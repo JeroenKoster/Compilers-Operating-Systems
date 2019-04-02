@@ -2,8 +2,11 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     private ParseTreeProperty<DataType> types = new ParseTreeProperty<>();
+    private ParseTreeProperty<Symbol> symbols = new ParseTreeProperty<>();
+    private Scope scope = new Scope(null, null);
 
     public ParseTreeProperty<DataType> getTypes() { return types; }
+    public ParseTreeProperty<Symbol> getSymbols() { return symbols; }
 
 
     /**
@@ -29,6 +32,12 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
     @Override
     public DataType visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
+//        String name = ctx.IDENTIFIER().getText();
+//        VariableSymbol symbol = (VariableSymbol)symbols.get(name);
+//
+//        if(symbol == null)
+//            throw new CompilerException("Unknown variable");
+
         types.put(ctx, DataType.STRING);
         return DataType.STRING;
     }

@@ -2,6 +2,7 @@
   <library name="jasmin">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/jasmin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/antlr-runtime-4.7.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
