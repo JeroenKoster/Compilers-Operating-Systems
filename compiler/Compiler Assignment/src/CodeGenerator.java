@@ -84,20 +84,20 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
      * Statements
      */
 
-//    @Override
-//    public ArrayList<String> visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
-//        String name = ctx.IDENTIFIER().getText();
-//        DataType type = DataType.INT;
-//        int index = 0;
-//
-////        if( ctx.INT == null)
-////            type = DataType.STRING;
-//
-//        VariableSymbol symbol = new VariableSymbol(name, type, index);
-//        symbols.put(ctx, symbol);
-//
-//        return null;
-//    }
+    @Override
+    public ArrayList<String> visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
+        String name = ctx.IDENTIFIER().getText();
+        DataType type = DataType.INT;
+        int index = 0;
+
+//        if( ctx.INT == null)
+//            type = DataType.STRING;
+
+        VariableSymbol symbol = new VariableSymbol(name, type, index);
+        symbols.put(ctx, symbol);
+
+        return null;
+    }
 
     @Override
     public ArrayList<String> visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
