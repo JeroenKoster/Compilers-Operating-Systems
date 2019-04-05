@@ -155,7 +155,7 @@ public class Compiler {
         //       created above and emit lines of Jasmin code for the nodes in the parse tree.
         //       For now, I'll just create a simple template that prints 'Hello world!'
 
-        CodeGenerator codeGenerator = new CodeGenerator(checker.getTypes());
+        CodeGenerator codeGenerator = new CodeGenerator(checker.getTypes(), checker.getSymbols());
         ArrayList<String> code = codeGenerator.visit(parseTree);
 
         out.println(".class public test");

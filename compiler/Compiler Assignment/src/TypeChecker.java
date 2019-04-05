@@ -1,13 +1,21 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
+import javax.xml.crypto.Data;
+
 public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     private ParseTreeProperty<DataType> types = new ParseTreeProperty<>();
     private ParseTreeProperty<Symbol> symbols = new ParseTreeProperty<>();
-    private Scope scope = new Scope(null);
+    private Scope scope = new Scope(null, "GlobalScope");
 
     public ParseTreeProperty<DataType> getTypes() { return types; }
     public ParseTreeProperty<Symbol> getSymbols() { return symbols; }
 
+
+//    public TypeChecker() {
+//        Symbol symbol = new Symbol("args", DataType.STRING);
+//        scope.addVariable(symbol);
+//        scope.assignIndex(symbol);
+//    }
 
     /**
      * Expressions
@@ -25,6 +33,12 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     }
 
     @Override
+    public DataType visitExBoolLiteral(OurLanguageParser.ExBoolLiteralContext ctx) {
+        types.put(ctx, DataType.BOOL);
+        return DataType.BOOL;
+    }
+
+    @Override
     public DataType visitExStringLiteral(OurLanguageParser.ExStringLiteralContext ctx) {
         types.put(ctx, DataType.STRING);
         return DataType.STRING;
@@ -33,7 +47,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
         String name = ctx.IDENTIFIER().getText();
-        VariableSymbol symbol = (VariableSymbol)symbols.lookupVariable(name);
+        Symbol symbol = symbols.get(ctx);
 
         if(symbol == null)
             throw new CompilerException("Unknown variable");
@@ -41,6 +55,8 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         types.put(ctx, DataType.STRING);
         return DataType.STRING;
     }
+
+
 
     @Override
     public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
@@ -71,17 +87,51 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
         DataType exprType = visit(ctx.expression());
-		String name = ctx.expression().getText();
 
         if( exprType == DataType.INT) {
-            System.out.println("Printstatement expression datatype is int");
             types.put( ctx, exprType);
         }
         if( exprType == DataType.STRING) {
-            System.out.println("Printstatement expression datatype is string");
             types.put( ctx, exprType);
         }
-        System.out.println(types.toString());
+        return null;
+    }
+
+
+    /**
+     * IF Statement
+     */
+
+    @Override
+    public DataType visitCondition(OurLanguageParser.ConditionContext ctx) {
+        DataType leftType = visit( ctx.left);
+        DataType rightType = visit( ctx.right);
+
+        if(leftType != rightType) {
+            throw new CompilerException("Can only compare similar values");
+        }
+
+        types.put(ctx, DataType.BOOL);
+        return DataType.BOOL;
+    }
+
+    @Override
+    public DataType visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
+        DataType conditionType = visit(ctx.condition());
+
+        if(conditionType != DataType.BOOL) {
+            throw new CompilerException("Condition is not a boolean");
+        }
+        return null;
+    }
+
+    @Override
+    public DataType visitBlock(OurLanguageParser.BlockContext ctx) {
+        scope = scope.createChild("Block");
+//        for (OurLanguageParser.StatementContext statement : ctx.statement()) {
+//            visit(statement);
+//        }
+        scope = scope.getParentScope();
         return null;
     }
 }

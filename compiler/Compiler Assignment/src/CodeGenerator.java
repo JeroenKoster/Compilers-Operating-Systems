@@ -10,8 +10,9 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     private ParseTreeProperty<DataType> types;
     private ParseTreeProperty<Symbol> symbols;
 
-    public CodeGenerator( ParseTreeProperty<DataType> types) {
+    public CodeGenerator( ParseTreeProperty<DataType> types, ParseTreeProperty<Symbol> symbols) {
         this.types = types;
+        this.symbols = symbols;
     }
 
     @Override
@@ -59,6 +60,11 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     }
 
     @Override
+    public ArrayList<String> visitExBoolLiteral(OurLanguageParser.ExBoolLiteralContext ctx) {
+        return super.visitExBoolLiteral(ctx);
+    }
+
+    @Override
     public ArrayList<String> visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
         ArrayList<String> code = visit(ctx.left);
         code.addAll(visit(ctx.right));
@@ -93,7 +99,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
 //        if( ctx.INT == null)
 //            type = DataType.STRING;
 
-        VariableSymbol symbol = new VariableSymbol(name, type, index);
+        Symbol symbol = new Symbol(name, type);
         symbols.put(ctx, symbol);
 
         return null;
@@ -106,11 +112,48 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.addAll( visit(ctx.expression()) );
 
         if( types.get(ctx.expression()) == DataType.INT )
-            code.add("invokevirtual java/io/PrintStream/print(I)V");
+            code.add("invokevirtual java/io/PrintStream/println(I)V");
         else if( types.get(ctx.expression()) == DataType.STRING )
-            code.add("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+            code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         else
             code.add("; Oops... should have a println()-call here...");
+        return code;
+    }
+
+
+    /**
+     * IF statement
+     */
+    @Override
+    public ArrayList<String> visitCondition(OurLanguageParser.ConditionContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        code.add("ldc " + ctx.left.getText());
+        code.add("ldc " + ctx.right.getText());
+
+//        ctx.comp.getText().equals('<')
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        if(ctx.condition().getText() == "true") {
+            code.addAll(visit(ctx.block()));
+        } else if (ctx.condition().getText() == "false") {
+            // go to else part of the statement
+        } else {
+            code.add("; If statement condition isn't true or false");
+        }
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitBlock(OurLanguageParser.BlockContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        code.addAll(visit(ctx.statement()));
         return code;
     }
 }

@@ -40,6 +40,12 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitVariableName(OurLanguageParser.VariableNameContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#assignment}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignment(OurLanguageParser.AssignmentContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link OurLanguageParser#printStatement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -51,6 +57,12 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBlock(OurLanguageParser.BlockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link OurLanguageParser#condition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCondition(OurLanguageParser.ConditionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExNegate}
 	 * labeled alternative in {@link OurLanguageParser#expression}.
@@ -79,6 +91,13 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExAddOp(OurLanguageParser.ExAddOpContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExBoolLiteral}
+	 * labeled alternative in {@link OurLanguageParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExBoolLiteral(OurLanguageParser.ExBoolLiteralContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExIntLiteral}
 	 * labeled alternative in {@link OurLanguageParser#expression}.

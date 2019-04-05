@@ -1,3 +1,3 @@
 public enum DataType {
-    INT, STRING
+    INT, STRING, BOOL
 }
