@@ -25,11 +25,7 @@ public class Scope {
         return new Scope(this, name);
     }
 
-    public Scope closeChild() {
-        return parentScope;
-    }
-
-    public boolean addChildeScope(Scope scope) {
+    public boolean addChildScope(Scope scope) {
         return childScopes.add(scope);
     }
 

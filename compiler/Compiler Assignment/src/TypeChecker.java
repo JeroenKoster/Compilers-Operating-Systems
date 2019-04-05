@@ -56,8 +56,6 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return DataType.STRING;
     }
 
-
-
     @Override
     public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
         DataType leftType = visit( ctx.left);
