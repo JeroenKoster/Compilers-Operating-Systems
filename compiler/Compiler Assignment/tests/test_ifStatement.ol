@@ -1,0 +1,5 @@
+IF 1 < 2 { PRINT "DIT"; }
+ELSE IF 2 < 3 { PRINT "MOET"; }
+ELSE IF 3 > 3 { PRINT "ALLEMAAL"; }
+IF 4 < 5 { PRINT "GEPRINT"; }
+ELSE { PRINT "WORDEN"; }
