@@ -85,21 +85,24 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
         DataType exprType = visit(ctx.expression());
+        System.out.println(exprType);
 
-        if( exprType == DataType.INT) {
+        if(exprType == DataType.INT) {
             types.put( ctx, exprType);
-        }
-        if( exprType == DataType.STRING) {
+        } else if(exprType == DataType.STRING) {
             types.put( ctx, exprType);
+        } else if(exprType == DataType.BOOL) {
+            types.put( ctx, exprType);
+        } else {
+            throw new CompilerException("Can not print expression of this type");
         }
+
         return null;
     }
-
 
     /**
      * IF Statement
      */
-
     @Override
     public DataType visitCondition(OurLanguageParser.ConditionContext ctx) {
         DataType leftType = visit( ctx.left);
@@ -116,6 +119,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
         DataType conditionType = visit(ctx.condition());
+        visit(ctx.block());
 
         if(conditionType != DataType.BOOL) {
             throw new CompilerException("Condition is not a boolean");
@@ -126,9 +130,9 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitBlock(OurLanguageParser.BlockContext ctx) {
         scope = scope.createChild("Block");
-//        for (OurLanguageParser.StatementContext statement : ctx.statement()) {
-//            visit(statement);
-//        }
+        for (OurLanguageParser.StatementContext statement : ctx.statement()) {
+            visit(statement);
+        }
         scope = scope.getParentScope();
         return null;
     }

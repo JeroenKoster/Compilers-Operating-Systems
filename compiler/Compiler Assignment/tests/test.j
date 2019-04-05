@@ -5,6 +5,20 @@
 .limit stack 99
 .limit locals 99
 
+    ldc 2
+    ldc 1
+    if_icmpgt true_0
+    	 ldc 0
+    	 goto end_0
+    true_0:
+    	 ldc 1
+    end_0:
+    ldc 1
+    if_icmpeq true_1
+    	 ldc 0
+    	 goto end_1
+    true_1:
+    	 ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 1
     ldc 2
@@ -12,13 +26,7 @@
     invokevirtual java/io/PrintStream/println(I)V
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc 4
-    ldc 5
-    imul
-    ldc 3
-    isub
     invokevirtual java/io/PrintStream/println(I)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "Hi"
-    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    end_1:
     return
 .end method

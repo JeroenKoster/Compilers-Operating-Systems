@@ -5,7 +5,7 @@ start: (statement*) EOF;
 statement
     : printStatement
     | ifStatement
-    | loop
+//    | loop
     | declaration
     | assignment
     | block
@@ -14,7 +14,7 @@ statement
 ifStatement: 'IF' condition block;
 //ifStatement: 'IF' expression block ('ELSE' (ifStatement | block))?;
 
-loop: 'WHILE' expression block;
+//loop: 'WHILE' expression block;
 
 declaration: variableName IDENTIFIER ';';
 
@@ -24,15 +24,15 @@ assignment: IDENTIFIER '=' expression ';';
 
 printStatement: 'PRINT' expression ';';
 
-block: '{' statement '}';
+block: '{' (statement)* '}';
 //block: '{' ( expression* | statement* ) '}';
 
 condition: left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression;
 
 expression
     : '(' expression ')'                                   # ExParentheses
-    | expression comp=( '<' | '>' | '==' | '!=') expression
-        (('OR' | 'AND' ) expression)?                      # ExLogical
+//    | expression comp=( '<' | '>' | '==' | '!=') expression
+//        (('OR' | 'AND' ) expression)?                      # ExLogical
     | '-' expression                                       # ExNegate
     | left=expression '*' right=expression                 # ExMulOp
     | left=expression op=('+'|'-') right=expression        # ExAddOp
@@ -47,4 +47,4 @@ STRING: '"' ~('\n'|'\r')* '"';
 BOOLEAN: 'true' | 'false';
 IDENTIFIER: [A-Za-z][A-Za-z_]*;
 WS: [\r\n\t ]+ -> skip;
-COMMENT: '//'.*? [\n\r]+ -> skip;O
+COMMENT: '//'.*? [\n\r]+ -> skip;

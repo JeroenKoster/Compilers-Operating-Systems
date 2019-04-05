@@ -17,6 +17,7 @@ public class Scope {
 
         if (parentScope == null) {
             this.index = 0;
+        } else {
             this.index = parentScope.index;
         }
     }
