@@ -30,17 +30,17 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return DataType.STRING;
     }
 
-    @Override
-    public DataType visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
-        String name = ctx.IDENTIFIER().getText();
-        VariableSymbol symbol = (VariableSymbol)symbols.lookupVariable(name);
-
-        if(symbol == null)
-            throw new CompilerException("Unknown variable");
-
-        types.put(ctx, DataType.STRING);
-        return DataType.STRING;
-    }
+//    @Override
+//    public DataType visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
+//        String name = ctx.IDENTIFIER().getText();
+////        VariableSymbol symbol = (VariableSymbol)symbols. lookupVariable(name);
+////
+////        if(symbol == null)
+////            throw new CompilerException("Unknown variable");
+//
+//        types.put(ctx, DataType.STRING);
+//        return DataType.STRING;
+//    }
 
     @Override
     public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {

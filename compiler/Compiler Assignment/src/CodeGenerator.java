@@ -92,9 +92,9 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
 
 //        if( ctx.INT == null)
 //            type = DataType.STRING;
-
-        VariableSymbol symbol = new VariableSymbol(name, type, index);
-        symbols.put(ctx, symbol);
+//
+//        VariableSymbol symbol = new VariableSymbol(name, type, index);
+//        symbols.put(ctx, symbol);
 
         return null;
     }
@@ -106,9 +106,9 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.addAll( visit(ctx.expression()) );
 
         if( types.get(ctx.expression()) == DataType.INT )
-            code.add("invokevirtual java/io/PrintStream/print(I)V");
+            code.add("invokevirtual java/io/PrintStream/println(I)V");
         else if( types.get(ctx.expression()) == DataType.STRING )
-            code.add("invokevirtual java/io/PrintStream/print(Ljava/lang/String;)V");
+            code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         else
             code.add("; Oops... should have a println()-call here...");
         return code;
