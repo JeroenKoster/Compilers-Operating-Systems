@@ -4,9 +4,10 @@ public class Symbol {
     private DataType type;
     private int index;
 
-    public Symbol(String name, DataType type) {
+    public Symbol(String name, DataType type, int index) {
         this.name = name;
         this.type = type;
+        this.index = index;
     }
 
     public String getName() {
@@ -19,9 +20,5 @@ public class Symbol {
 
     public int getIndex() {
         return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 }

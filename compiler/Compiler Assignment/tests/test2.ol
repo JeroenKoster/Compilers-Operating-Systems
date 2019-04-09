@@ -1,3 +1,4 @@
-// Sample program that declares and assigns to variables
-STRING text;
-PRINT 1 + 2 ;
+IF 2 > 1 {
+    PRINT 1 + 2;
+    PRINT 4;
+}

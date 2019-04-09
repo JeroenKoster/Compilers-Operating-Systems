@@ -47,7 +47,18 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     @Override
     public ArrayList<String> visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
         ArrayList<String> code = new ArrayList<>();
-        code.add("; Should do iload or aload here....." );
+        Symbol symbol = symbols.get(ctx);
+
+        if (symbol.getType() == DataType.INT) {
+            code.add("iload " + symbol.getIndex());
+        } else if (symbol.getType() == DataType.STRING) {
+            code.add("aload " + symbol.getIndex());
+        } else if (symbol.getType() == DataType.BOOL) {
+            code.add("baload " + symbol.getIndex());
+        } else {
+            throw new CompilerException("Can not load variable " + symbol.getName());
+        }
+
         return code;
     }
 
@@ -93,28 +104,39 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
 
     @Override
     public ArrayList<String> visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
-        String name = ctx.IDENTIFIER().getText();
-        DataType type = DataType.INT;
-        int index = 0;
+        ArrayList<String> code = new ArrayList<>();
+        return code;
+    }
 
-//        if( ctx.INT == null)
-//            type = DataType.STRING;
+    @Override
+    public ArrayList<String> visitAssignment(OurLanguageParser.AssignmentContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        Symbol symbol = symbols.get(ctx);
 
-        Symbol symbol = new Symbol(name, type);
-        symbols.put(ctx, symbol);
+        code.addAll(visit(ctx.expression()));
 
-        return null;
+        if (symbol.getType() == DataType.INT) {
+            code.add("istore " + symbol.getIndex());
+        } else if (symbol.getType() == DataType.STRING) {
+            code.add("astore " + symbol.getIndex());
+        } else if (symbol.getType() == DataType.BOOL) {
+            code.add("bastore " + symbol.getIndex());
+        } else {
+            throw new CompilerException("Can not store variable " + ctx.IDENTIFIER().getText());
+        }
+        return code;
     }
 
     @Override
     public ArrayList<String> visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
         ArrayList<String> code = new ArrayList<>();
+
         code.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
         code.addAll( visit(ctx.expression()) );
 
         System.out.println(types.get(ctx.expression()));
 
-        if( types.get(ctx.expression()) == DataType.INT )
+        if( types.get(ctx.expression()) == DataType.INT)
             code.add("invokevirtual java/io/PrintStream/println(I)V");
         else if( types.get(ctx.expression()) == DataType.STRING )
             code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
@@ -158,7 +180,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
                 throw new CompilerException("Error while comparing condition");
         }
 
-        // if false returns goto end
+        // if false returns ldc 0 and goto end
         code.add("\t ldc 0");
         code.add("\t goto end_" + LABELCOUNTER);
         // if true returns ldc 1

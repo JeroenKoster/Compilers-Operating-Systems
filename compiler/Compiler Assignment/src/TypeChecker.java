@@ -10,13 +10,6 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     public ParseTreeProperty<DataType> getTypes() { return types; }
     public ParseTreeProperty<Symbol> getSymbols() { return symbols; }
 
-
-//    public TypeChecker() {
-//        Symbol symbol = new Symbol("args", DataType.STRING);
-//        scope.addVariable(symbol);
-//        scope.assignIndex(symbol);
-//    }
-
     /**
      * Expressions
      */
@@ -47,13 +40,15 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     @Override
     public DataType visitExIdentifier(OurLanguageParser.ExIdentifierContext ctx) {
         String name = ctx.IDENTIFIER().getText();
-        Symbol symbol = symbols.get(ctx);
+        Symbol symbol = scope.findVariable(name);
 
-        if(symbol == null)
+        if(symbol == null) {
             throw new CompilerException("Unknown variable");
+        }
 
-        types.put(ctx, DataType.STRING);
-        return DataType.STRING;
+        symbols.put(ctx, symbol);
+        types.put(ctx, symbol.getType());
+        return symbol.getType();
     }
 
     @Override
@@ -82,22 +77,12 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return leftType;
     }
 
+    /**
+     * Statements
+     */
     @Override
     public DataType visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
-        DataType exprType = visit(ctx.expression());
-        System.out.println(exprType);
-
-        if(exprType == DataType.INT) {
-            types.put( ctx, exprType);
-        } else if(exprType == DataType.STRING) {
-            types.put( ctx, exprType);
-        } else if(exprType == DataType.BOOL) {
-            types.put( ctx, exprType);
-        } else {
-            throw new CompilerException("Can not print expression of this type");
-        }
-
-        return null;
+        return super.visitPrintStatement(ctx);
     }
 
     /**
@@ -134,6 +119,51 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
             visit(statement);
         }
         scope = scope.getParentScope();
+
+        return null;
+    }
+
+    /**
+     * Declaration & Assignment
+     */
+    @Override
+    public DataType visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
+        DataType symbolType = null;
+
+        if (ctx.variableName().getText().equals("INT")) {
+            symbolType = DataType.INT;
+        } else if (ctx.variableName().getText().equals("STRING")) {
+            symbolType = DataType.STRING;
+        } else if (ctx.variableName().getText().equals("BOOL")) {
+            symbolType = DataType.BOOL;
+        } else {
+            throw new CompilerException("Invalid declaration type");
+        }
+
+        Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
+        symbols.put(ctx, symbol);
+
+        return null;
+    }
+
+    @Override
+    public DataType visitAssignment(OurLanguageParser.AssignmentContext ctx) {
+        String variableName = ctx.IDENTIFIER().getText();
+        Symbol symbol = scope.findVariable(variableName);
+
+        DataType variableType = symbol.getType();
+        DataType expressionType = visit(ctx.expression());
+
+        if (symbol != null) {
+            if (variableType != expressionType) {
+                throw new CompilerException("Can not assign value to variable that has not the same type");
+            }
+        } else {
+            throw new CompilerException("Can not assign value to " + variableName );
+        }
+
+        symbols.put(ctx, symbol);
+
         return null;
     }
 }

@@ -5,16 +5,16 @@ start: (statement*) EOF;
 statement
     : printStatement
     | ifStatement
-//    | loop
+    | loop
     | declaration
     | assignment
     | block
     ;
 
 ifStatement: 'IF' condition block;
-//ifStatement: 'IF' expression block ('ELSE' (ifStatement | block))?;
+//ifStatement: 'IF' condition block ('ELSE' (ifStatement | block))+;
 
-//loop: 'WHILE' expression block;
+loop: 'WHILE' condition block;
 
 declaration: variableName IDENTIFIER ';';
 
@@ -44,7 +44,7 @@ expression
 
 INT: '0' | [1-9][0-9]*;
 STRING: '"' ~('\n'|'\r')* '"';
-BOOLEAN: 'true' | 'false';
-IDENTIFIER: [A-Za-z][A-Za-z_]*;
+BOOLEAN: '0' | '1';
+IDENTIFIER: '.'[A-Za-z][A-Za-z_]*;
 WS: [\r\n\t ]+ -> skip;
 COMMENT: '//'.*? [\n\r]+ -> skip;

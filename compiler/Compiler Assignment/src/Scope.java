@@ -9,7 +9,6 @@ public class Scope {
 
     private String name;
     private int index;
-//    private int stack;
 
     public Scope(Scope parentScope, String name) {
         this.parentScope = parentScope;
@@ -22,21 +21,42 @@ public class Scope {
         }
     }
 
+    /**
+     * Scope
+     */
     public Scope createChild(String name) {
         return new Scope(this, name);
     }
 
-    public boolean addChildScope(Scope scope) {
-        return childScopes.add(scope);
+    public Scope getParentScope() {
+        return parentScope;
     }
 
-    public boolean addVariable(Symbol variable) {
-        Symbol symbol = findVariable(variable.getName());
-        if (symbol == null) {
-            variables.put(variable.getName(), variable);
-            return true;
+    public ArrayList<Scope> getChildScopes() {
+        return childScopes;
+    }
+
+    public Scope getGlobalParent() {
+        if (parentScope != null) {
+            return parentScope.getGlobalParent();
         }
-        return false;
+        return this;
+    }
+
+    /**
+     * Declaration
+     */
+    public Symbol declareVariable(String name, DataType type) {
+        int index = variables.size();
+
+        if (findVariable(name) == null){
+            Symbol variableSymbol = new Symbol(name, type, index);
+            variables.put(name, variableSymbol);
+            return variableSymbol;
+        } else {
+//            throw new CompilerException("Variable " + name + " already exists");
+            return null;
+        }
     }
 
     public Symbol findVariable(String name) {
@@ -49,32 +69,5 @@ public class Scope {
         } else {
             return variables.get(name);
         }
-    }
-
-    public Scope getGlobalParent() {
-        if (parentScope != null) {
-            return parentScope.getGlobalParent();
-        }
-        return this;
-    }
-
-    public void assignIndex(Symbol symbol) {
-        symbol.setIndex(index++);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Scope getParentScope() {
-        return parentScope;
-    }
-
-    public ArrayList<Scope> getChildScopes() {
-        return childScopes;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }
