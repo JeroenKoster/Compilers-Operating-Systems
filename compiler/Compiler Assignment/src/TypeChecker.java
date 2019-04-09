@@ -152,11 +152,11 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         Symbol symbol = scope.findVariable(variableName);
 
         DataType variableType = symbol.getType();
-        DataType expressionType = visit(ctx.expression());
+        DataType expressionType = visit(ctx.expression()); // ldc 0 of ldc 1
 
         if (symbol != null) {
             if (variableType != expressionType) {
-                throw new CompilerException("Can not assign value to variable that has not the same type");
+                throw new CompilerException("Can not assign value to variable that has not the same type" + variableType + " " + expressionType );
             }
         } else {
             throw new CompilerException("Can not assign value to " + variableName );

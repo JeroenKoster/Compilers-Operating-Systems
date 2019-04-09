@@ -18,14 +18,13 @@ loop: 'WHILE' condition block;
 
 declaration: variableName IDENTIFIER ';';
 
-variableName: ('INT' | 'STRING');
+variableName: ('INT' | 'STRING' | 'BOOL');
 
 assignment: IDENTIFIER '=' expression ';';
 
 printStatement: 'PRINT' expression ';';
 
 block: '{' (statement)* '}';
-//block: '{' ( expression* | statement* ) '}';
 
 condition: left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression;
 
@@ -44,7 +43,7 @@ expression
 
 INT: '0' | [1-9][0-9]*;
 STRING: '"' ~('\n'|'\r')* '"';
-BOOLEAN: '0' | '1';
+BOOLEAN: 'true' | 'false';
 IDENTIFIER: '.'[A-Za-z][A-Za-z_]*;
 WS: [\r\n\t ]+ -> skip;
 COMMENT: '//'.*? [\n\r]+ -> skip;

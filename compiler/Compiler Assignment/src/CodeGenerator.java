@@ -54,7 +54,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         } else if (symbol.getType() == DataType.STRING) {
             code.add("aload " + symbol.getIndex());
         } else if (symbol.getType() == DataType.BOOL) {
-            code.add("baload " + symbol.getIndex());
+            code.add("iload " + symbol.getIndex());
         } else {
             throw new CompilerException("Can not load variable " + symbol.getName());
         }
@@ -73,7 +73,19 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
 
     @Override
     public ArrayList<String> visitExBoolLiteral(OurLanguageParser.ExBoolLiteralContext ctx) {
-        return super.visitExBoolLiteral(ctx);
+        ArrayList<String> code = new ArrayList<>();
+
+        if (ctx.BOOLEAN().getText().equals("true")) {
+//            throw new CompilerException("THIS IS ME TRUE " + ctx.BOOLEAN().getText());
+            code.add("ldc 1");
+        } else if (ctx.BOOLEAN().getText().equals("false")) {
+//            throw new CompilerException("THIS IS ME TRUE " + ctx.BOOLEAN().getText());
+            code.add("ldc 0");
+        } else {
+            throw new CompilerException("Invalid boolean");
+        }
+
+        return code;
     }
 
     @Override
@@ -120,7 +132,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         } else if (symbol.getType() == DataType.STRING) {
             code.add("astore " + symbol.getIndex());
         } else if (symbol.getType() == DataType.BOOL) {
-            code.add("bastore " + symbol.getIndex());
+            code.add("istore " + symbol.getIndex());
         } else {
             throw new CompilerException("Can not store variable " + ctx.IDENTIFIER().getText());
         }
@@ -141,7 +153,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         else if( types.get(ctx.expression()) == DataType.STRING )
             code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
         else if (types.get(ctx.expression()) == DataType.BOOL)
-            code.add("invokevirtual java/io/PrintStream/println(boolean)");
+            code.add("invokevirtual java/io/PrintStream/println(Z)V");
         else
             code.add("; Oops... should have a println()-call here...");
         return code;
