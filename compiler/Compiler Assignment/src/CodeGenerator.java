@@ -146,7 +146,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
         code.addAll( visit(ctx.expression()) );
 
-        System.out.println(types.get(ctx.expression()));
+//        System.out.println(types.get(ctx.expression()));
 
         if( types.get(ctx.expression()) == DataType.INT)
             code.add("invokevirtual java/io/PrintStream/println(I)V");
@@ -208,20 +208,30 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     @Override
     public ArrayList<String> visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
         ArrayList<String> code = new ArrayList<>();
-        code.addAll(visit(ctx.condition()));
 
-        code.add("ldc 1");
-        code.add("if_icmpeq true_" + LABELCOUNTER);
-
-        // if false returns goto end
+        // Loop through each of the if condition, skip to the corresponding block if its true
+        for (int i = 0; i < ctx.condition().size(); i++) {
+            code.addAll(visit(ctx.condition(i)));
+            code.add("ldc 1");
+            code.add("if_icmpeq true_1234_" + i);
+            System.out.println("added true_" + LABELCOUNTER);
+        }
         code.add("\t ldc 0");
-        code.add("\t goto end_" + LABELCOUNTER);
-        // if true returns ldc 1
-        code.add("true_" + LABELCOUNTER + ":");
-        code.add("\t ldc 1");
-        code.addAll(visit(ctx.block()));
-        code.add("end_" + LABELCOUNTER + ":");
+        // If there are more blocks than conditions, an else block exists
+        // There is probably a nicer way to do this check
+        if (ctx.block().size() > ctx.condition().size()) {
+            System.out.println("Else block detected");
+            code.addAll(visit(ctx.block(ctx.block().size() - 1))); // If we reach this, none of the if- or elseIf-conditions was true
+        }
+        code.add("\t goto end_" + LABELCOUNTER); // Skip all the ifBlocks
 
+        for (int i = 0; i < ctx.condition().size(); i++) { // Add blocks for each if / if-else statement
+            code.add("true_1234_" + i + ":");
+            code.add("\t ldc 1");
+            code.addAll(visit(ctx.block(i)));
+            code.add("\t goto end_" + LABELCOUNTER); // Skip all the remaining ifBlocks
+        }
+        code.add("end_" + LABELCOUNTER + ":");
         LABELCOUNTER++;
 
         return code;
@@ -230,7 +240,6 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     @Override
     public ArrayList<String> visitBlock(OurLanguageParser.BlockContext ctx) {
         ArrayList<String> code = new ArrayList<>();
-        System.out.println("IN BLOCK");
 
         for (OurLanguageParser.StatementContext statement : ctx.statement() ) {
             code.addAll(visit(statement));

@@ -21,11 +21,11 @@ void Sequence::execute() {
 	int counter = 0;
 	for( Pipeline *p : pipelines ) {
         int cid = fork();
-		if (cid == 0) {
+		if (cid == 0) { // Child proccess should execute the command
 			p->execute();
 		} 
-		else if (cid > 0) {
-			if (!p->isAsync()) {
+		else if (cid > 0) { // Parent Process
+			if (!p->isAsync()) { // Wait for the child process to finish (unless async)
 				waitpid(cid, NULL, 0);
 			}
 		} else {

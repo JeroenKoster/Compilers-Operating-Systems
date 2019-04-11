@@ -11,8 +11,8 @@ statement
     | block
     ;
 
-ifStatement: 'IF' condition block;
-//ifStatement: 'IF' condition block ('ELSE' (ifStatement | block))+;
+//ifStatement: 'IF' condition block;
+ifStatement: 'IF' condition block ('ELSE IF' condition block)* ('ELSE' block)?;
 
 loop: 'WHILE' condition block;
 

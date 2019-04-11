@@ -103,12 +103,18 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
     @Override
     public DataType visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
-        DataType conditionType = visit(ctx.condition());
-        visit(ctx.block());
 
-        if(conditionType != DataType.BOOL) {
-            throw new CompilerException("Condition is not a boolean");
-        }
+        ctx.condition().forEach(c -> {
+            DataType conditionType = visit(c);
+            if(conditionType != DataType.BOOL) {
+                throw new CompilerException("Condition is not a boolean");
+            }
+        });
+
+        ctx.block().forEach(b -> {
+            visit(b);
+        });
+
         return null;
     }
 
