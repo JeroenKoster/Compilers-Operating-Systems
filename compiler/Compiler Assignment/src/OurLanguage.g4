@@ -5,16 +5,18 @@ start: (statement*) EOF;
 statement
     : printStatement
     | ifStatement
-    | loop
+    | whileLoop
+    | forLoop
     | declaration
     | assignment
     | block
     ;
 
-//ifStatement: 'IF' condition block;
 ifStatement: 'IF' condition block ('ELSE IF' condition block)* ('ELSE' block)?;
 
-loop: 'WHILE' condition block;
+whileLoop: 'WHILE' condition block;
+
+forLoop: 'FOR' condition ';' assignment block;
 
 declaration: variableName IDENTIFIER ';';
 

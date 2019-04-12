@@ -9,3 +9,6 @@ PRINT .b;
 BOOL .c;
 .c = true;
 PRINT .c;
+
+INT .hello;
+.hello = 0;
