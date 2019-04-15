@@ -1,5 +1,6 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -125,9 +126,36 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
      */
 
     @Override
-    public ArrayList<String> visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
+    public ArrayList<String> visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
         ArrayList<String> code = new ArrayList<>();
         return code;
+    }
+
+    @Override
+    public ArrayList<String> visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        Symbol symbol = symbols.get(ctx);
+
+        code.addAll(visit(ctx.expression()));
+        code.add(assignment(symbol));
+
+        return code;
+    }
+
+    private String assignment(Symbol symbol) {
+        String assingmentString;
+
+        if (symbol.getType() == DataType.INT) {
+            assingmentString = "istore " + symbol.getIndex();
+        } else if (symbol.getType() == DataType.STRING) {
+            assingmentString = "astore " + symbol.getIndex();
+        } else if (symbol.getType() == DataType.BOOL) {
+            assingmentString = "istore " + symbol.getIndex();
+        } else {
+            throw new CompilerException("Can not store variable " + symbol.getName());
+        }
+
+        return assingmentString;
     }
 
     @Override
@@ -136,16 +164,8 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         Symbol symbol = symbols.get(ctx);
 
         code.addAll(visit(ctx.expression()));
+        code.add(assignment(symbol));
 
-        if (symbol.getType() == DataType.INT) {
-            code.add("istore " + symbol.getIndex());
-        } else if (symbol.getType() == DataType.STRING) {
-            code.add("astore " + symbol.getIndex());
-        } else if (symbol.getType() == DataType.BOOL) {
-            code.add("istore " + symbol.getIndex());
-        } else {
-            throw new CompilerException("Can not store variable " + ctx.IDENTIFIER().getText());
-        }
         return code;
     }
 

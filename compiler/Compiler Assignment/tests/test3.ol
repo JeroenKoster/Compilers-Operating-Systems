@@ -10,5 +10,11 @@ BOOL .c;
 .c = true;
 PRINT .c;
 
-INT .hello;
-.hello = 0;
+INT .zero = 0;
+PRINT .zero;
+
+STRING .hello = "Hello";
+PRINT .hello;
+
+BOOL .bool = false;
+PRINT .bool;

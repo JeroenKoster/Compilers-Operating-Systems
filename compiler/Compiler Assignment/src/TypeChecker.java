@@ -57,8 +57,6 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
         types.put(ctx, exprType);
 
-        System.out.println(exprType);
-
         return exprType;
     }
 
@@ -143,8 +141,9 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     /**
      * Declaration & Assignment
      */
+
     @Override
-    public DataType visitDeclaration(OurLanguageParser.DeclarationContext ctx) {
+    public DataType visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
         DataType symbolType = null;
 
         if (ctx.variableName().getText().equals("INT")) {
@@ -158,6 +157,38 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         }
 
         Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
+        symbols.put(ctx, symbol);
+
+        return null;
+    }
+
+    @Override
+    public DataType visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
+        DataType symbolType = null;
+
+        if (ctx.variableName().getText().equals("INT")) {
+            symbolType = DataType.INT;
+        } else if (ctx.variableName().getText().equals("STRING")) {
+            symbolType = DataType.STRING;
+        } else if (ctx.variableName().getText().equals("BOOL")) {
+            symbolType = DataType.BOOL;
+        } else {
+            throw new CompilerException("Invalid declaration type");
+        }
+
+        Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
+        symbols.put(ctx, symbol);
+
+        DataType expressionType = visit(ctx.expression()); // ldc 0 of ldc 1
+
+        if (symbol != null) {
+            if (symbolType != expressionType) {
+                throw new CompilerException("Can not assign value to variable that has not the same type" + symbolType + " " + expressionType );
+            }
+        } else {
+            throw new CompilerException("Can not assign value to " + symbolType );
+        }
+
         symbols.put(ctx, symbol);
 
         return null;
