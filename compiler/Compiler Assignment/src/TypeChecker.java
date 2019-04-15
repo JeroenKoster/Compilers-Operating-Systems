@@ -52,6 +52,17 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     }
 
     @Override
+    public DataType visitExParentheses(OurLanguageParser.ExParenthesesContext ctx) {
+        DataType exprType = visit(ctx.expression());
+
+        types.put(ctx, exprType);
+
+        System.out.println(exprType);
+
+        return exprType;
+    }
+
+    @Override
     public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
         DataType leftType = visit( ctx.left);
         DataType rightType = visit( ctx.right);
@@ -171,5 +182,10 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         symbols.put(ctx, symbol);
 
         return null;
+    }
+
+    @Override
+    public DataType visitWhileLoop(OurLanguageParser.WhileLoopContext ctx) {
+        return super.visitWhileLoop(ctx);
     }
 }

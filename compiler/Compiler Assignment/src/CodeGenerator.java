@@ -90,6 +90,15 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     }
 
     @Override
+    public ArrayList<String> visitExParentheses(OurLanguageParser.ExParenthesesContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        code.addAll(visit(ctx.expression()));
+
+        return code;
+    }
+
+    @Override
     public ArrayList<String> visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
         ArrayList<String> code = visit(ctx.left);
         code.addAll(visit(ctx.right));
