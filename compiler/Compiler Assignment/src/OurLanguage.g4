@@ -19,8 +19,8 @@ whileLoop: 'WHILE' condition block;
 forLoop: 'FOR' condition ';' assignment block;
 
 declaration
-    : variableName IDENTIFIER ';'                               # DeclOnly
-    | variableName IDENTIFIER '=' expression ';'                # DeclAndAssignment
+    : variableName IDENTIFIER ';'                                   # DeclOnly
+    | variableName IDENTIFIER '=' expression ';'                    # DeclAndAssignment
     ;
 
 variableName: ('INT' | 'STRING' | 'BOOL');
@@ -31,13 +31,18 @@ printStatement: 'PRINT' expression ';';
 
 block: '{' (statement)* '}';
 
-condition: left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression;
+condition
+    : left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression #ConditionalCond
+    | left=condition 'OR' right=condition                           # LogicalOrCond
+    | left=condition 'AND' right=condition                          # LogicalAndCond
+    | 'NOT' condition                                               # LogicalNotCond
+    | expression    /** BOOLEAN */                                  # LogicalExBool
+    ;
 
 expression
     : '(' expression ')'                                            # ExParentheses
-    | left=expression ( 'OR' | 'AND' | 'NOT' ) right=expression     # ExLogical
     | '-' expression                                                # ExNegate
-    | left=expression '*' right=expression                          # ExMulOp
+    | left=expression op=('*'|'/') right=expression                 # ExMulOp
     | left=expression op=('+'|'-') right=expression                 # ExAddOp
     | IDENTIFIER                                                    # ExIdentifier
     | INT                                                           # ExIntLiteral

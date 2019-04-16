@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import javax.xml.crypto.Data;
+import java.util.ArrayList;
 
 public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     private ParseTreeProperty<DataType> types = new ParseTreeProperty<>();
@@ -97,8 +98,9 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     /**
      * IF Statement
      */
+
     @Override
-    public DataType visitCondition(OurLanguageParser.ConditionContext ctx) {
+    public DataType visitConditionalCond(OurLanguageParser.ConditionalCondContext ctx) {
         DataType leftType = visit( ctx.left);
         DataType rightType = visit( ctx.right);
 
@@ -108,6 +110,58 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
         types.put(ctx, DataType.BOOL);
         return DataType.BOOL;
+    }
+
+    @Override
+    public DataType visitLogicalOrCond(OurLanguageParser.LogicalOrCondContext ctx) {
+        DataType leftType = visit(ctx.left);
+        DataType rightType = visit(ctx.right);
+
+        if (leftType != rightType) {
+            throw new CompilerException("Conditions not of the type");
+        } else if(leftType != DataType.BOOL) {
+            throw new CompilerException("Condition is not a boolean value");
+        }
+
+        types.put(ctx, leftType);
+        return leftType;
+    }
+
+    @Override
+    public DataType visitLogicalAndCond(OurLanguageParser.LogicalAndCondContext ctx) {
+        DataType leftType = visit(ctx.left);
+        DataType rightType = visit(ctx.right);
+
+        if (leftType != rightType) {
+            throw new CompilerException("Conditions not of the type");
+        } else if(leftType != DataType.BOOL) {
+            throw new CompilerException("Condition is not a boolean value");
+        }
+
+        types.put(ctx, leftType);
+        return leftType;
+    }
+
+    @Override
+    public DataType visitLogicalNotCond(OurLanguageParser.LogicalNotCondContext ctx) {
+        DataType conditionType = visit(ctx.condition());
+        if(conditionType != DataType.BOOL) {
+            throw new CompilerException("Condition is not a boolean value");
+        }
+
+        types.put(ctx, conditionType);
+        return conditionType;
+    }
+
+    @Override
+    public DataType visitLogicalExBool(OurLanguageParser.LogicalExBoolContext ctx) {
+        DataType exprType = visit(ctx.expression());
+
+        if (exprType != DataType.BOOL) {
+            throw new CompilerException("Condition must be of type bool");
+        }
+
+        return exprType;
     }
 
     @Override

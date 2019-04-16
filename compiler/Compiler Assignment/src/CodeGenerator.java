@@ -67,9 +67,8 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     @Override
     public ArrayList<String> visitExNegate(OurLanguageParser.ExNegateContext ctx) {
         ArrayList<String> code = new ArrayList<>();
-        code.add("ldc 0");
         code.add("ldc " + ctx.expression().getText());
-        code.add("isub");
+        code.add("ineg");
         return code;
     }
 
@@ -78,10 +77,8 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         ArrayList<String> code = new ArrayList<>();
 
         if (ctx.BOOLEAN().getText().equals("true")) {
-//            throw new CompilerException("THIS IS ME TRUE " + ctx.BOOLEAN().getText());
             code.add("ldc 1");
         } else if (ctx.BOOLEAN().getText().equals("false")) {
-//            throw new CompilerException("THIS IS ME TRUE " + ctx.BOOLEAN().getText());
             code.add("ldc 0");
         } else {
             throw new CompilerException("Invalid boolean");
@@ -117,7 +114,13 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     public ArrayList<String> visitExMulOp(OurLanguageParser.ExMulOpContext ctx) {
         ArrayList<String> code = visit( ctx.left );
         code.addAll( visit(ctx.right) );
-        code.add("imul");
+
+        if(ctx.op.getText().equals("*")){
+            code.add("imul");
+        } else if(ctx.op.getText().equals("/")){
+            code.add("idiv");
+        }
+
         return code;
     }
 
@@ -176,8 +179,6 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
         code.addAll( visit(ctx.expression()) );
 
-//        System.out.println(types.get(ctx.expression()));
-
         if( types.get(ctx.expression()) == DataType.INT)
             code.add("invokevirtual java/io/PrintStream/println(I)V");
         else if( types.get(ctx.expression()) == DataType.STRING )
@@ -189,12 +190,12 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         return code;
     }
 
-
     /**
      * IF statement
      */
+
     @Override
-    public ArrayList<String> visitCondition(OurLanguageParser.ConditionContext ctx) {
+    public ArrayList<String> visitConditionalCond(OurLanguageParser.ConditionalCondContext ctx) {
         ArrayList<String> code = new ArrayList<>();
         code.addAll(visit(ctx.left));
         code.addAll(visit(ctx.right));
@@ -236,6 +237,56 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     }
 
     @Override
+    public ArrayList<String> visitLogicalOrCond(OurLanguageParser.LogicalOrCondContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        code.addAll(visit(ctx.left));
+        code.addAll(visit(ctx.right));
+        code.add("ior");
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitLogicalAndCond(OurLanguageParser.LogicalAndCondContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        code.addAll(visit(ctx.left));
+        code.addAll(visit(ctx.right));
+        code.add("iand");
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitLogicalNotCond(OurLanguageParser.LogicalNotCondContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        code.addAll(visit(ctx.condition()));
+        code.add("ldc 1");
+        code.add("ixor");
+
+//
+//        System.out.println(visit(ctx.condition()));
+//
+//
+//        if (visit(ctx.condition()).get(0).equals("ldc 0")) {
+//            code.add("ldc 1");
+//        } else if (visit(ctx.condition()).get(0).equals("ldc 1")){
+//            code.add("ldc 0");
+//        } else {
+//            throw new CompilerException("Invalid NOT condition value");
+//        }
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitLogicalExBool(OurLanguageParser.LogicalExBoolContext ctx) {
+        return super.visitLogicalExBool(ctx);
+    }
+
+    @Override
     public ArrayList<String> visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
         ArrayList<String> code = new ArrayList<>();
 
@@ -245,13 +296,11 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
             code.add("ldc 1");
             code.add("if_icmpeq true_if_" + i + "_" +  LABELCOUNTER);
             code.add("true_if_" + i + "_"+ LABELCOUNTER + ":");
-            System.out.println("added true_if_" + i + "_" +  LABELCOUNTER);
         }
         code.add("\t ldc 0");
         // If there are more blocks than conditions, an else block exists
         // There is probably a nicer way to do this check
         if (ctx.block().size() > ctx.condition().size()) {
-            System.out.println("Else block detected");
             code.addAll(visit(ctx.block(ctx.block().size() - 1))); // If we reach this, none of the if- or elseIf-conditions was true
         }
         code.add("\t goto end_" + LABELCOUNTER); // Skip all the ifBlocks
