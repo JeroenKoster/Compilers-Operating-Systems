@@ -1,16 +1,7 @@
-IF 1 > 0 {
+IF NOT true {
+    PRINT "IM NOT TRUE";
+} ELSE IF true {
     PRINT "IM TRUE";
-}
-
-
-IF true {
-    PRINT "IM TRUE";
-}
-
-IF NOT false {
-    PRINT "IM TRUE";
-}
-
-IF NOT 1 > 2 {
-    PRINT "IM TRUE";
+} ELSE {
+    PRINT "IM FALSE";
 }

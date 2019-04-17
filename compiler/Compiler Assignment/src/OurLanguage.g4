@@ -12,11 +12,11 @@ statement
     | block
     ;
 
-ifStatement: 'IF' condition block ('ELSE IF' condition block)* ('ELSE' block)?;
+ifStatement: 'IF' expression block ('ELSE IF' expression block)* ('ELSE' block)?;
 
-whileLoop: 'WHILE' condition block;
+whileLoop: 'WHILE' expression block;
 
-forLoop: 'FOR' condition ';' assignment block;
+forLoop: 'FOR' expression ';' assignment block;
 
 declaration
     : variableName IDENTIFIER ';'                                   # DeclOnly
@@ -31,19 +31,15 @@ printStatement: 'PRINT' expression ';';
 
 block: '{' (statement)* '}';
 
-condition
-    : left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression #ConditionalCond
-    | left=condition 'OR' right=condition                           # LogicalOrCond
-    | left=condition 'AND' right=condition                          # LogicalAndCond
-    | 'NOT' condition                                               # LogicalNotCond
-    | expression    /** BOOLEAN */                                  # LogicalExBool
-    ;
-
 expression
     : '(' expression ')'                                            # ExParentheses
     | '-' expression                                                # ExNegate
     | left=expression op=('*'|'/') right=expression                 # ExMulOp
     | left=expression op=('+'|'-') right=expression                 # ExAddOp
+    | left=expression comp=('<'|'>'|'<='|'>='|'=='|'!=') right=expression #LogicalCond
+    | left=expression 'OR' right=expression                         # LogicalOrCond
+    | left=expression 'AND' right=expression                        # LogicalAndCond
+    | 'NOT' expression                                              # LogicalNotCond
     | IDENTIFIER                                                    # ExIdentifier
     | INT                                                           # ExIntLiteral
     | STRING                                                        # ExStringLiteral

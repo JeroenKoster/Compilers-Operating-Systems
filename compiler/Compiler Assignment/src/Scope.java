@@ -32,10 +32,6 @@ public class Scope {
         return parentScope;
     }
 
-    public ArrayList<Scope> getChildScopes() {
-        return childScopes;
-    }
-
     public Scope getGlobalParent() {
         if (parentScope != null) {
             return parentScope.getGlobalParent();

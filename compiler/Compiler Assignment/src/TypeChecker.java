@@ -22,12 +22,18 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
     @Override
     public DataType visitExNegate(OurLanguageParser.ExNegateContext ctx) {
+        if (visit(ctx.expression()) != DataType.INT) {
+            throw new CompilerException("Invalid INT value");
+        }
         types.put(ctx, DataType.INT);
         return DataType.INT;
     }
 
     @Override
     public DataType visitExBoolLiteral(OurLanguageParser.ExBoolLiteralContext ctx) {
+        if( !ctx.BOOLEAN().getText().equals("true") && !ctx.BOOLEAN().getText().equals("false")){
+            throw new CompilerException("Invalid BOOL value");
+        }
         types.put(ctx, DataType.BOOL);
         return DataType.BOOL;
     }
@@ -45,6 +51,9 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
         if(symbol == null) {
             throw new CompilerException("Unknown variable");
+        }
+        if((symbol.getType() != DataType.INT) && (symbol.getType() != DataType.STRING) && (symbol.getType() != DataType.BOOL)) {
+            throw new CompilerException("Unknown datatype " + symbol.getType());
         }
 
         symbols.put(ctx, symbol);
@@ -67,7 +76,10 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType rightType = visit( ctx.right);
 
         if( leftType != rightType) {
-            throw new CompilerException( "Can only add similar values" );
+            throw new CompilerException("Can only add or subtract values of INT");
+        }
+        if( (leftType != DataType.INT) || (rightType != DataType.INT)) {
+            throw new CompilerException("Expressions not of datatype INT");
         }
 
         types.put( ctx, leftType);
@@ -78,34 +90,38 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     public DataType visitExMulOp(OurLanguageParser.ExMulOpContext ctx) {
         DataType leftType = visit( ctx.left);
         DataType rightType = visit( ctx.right);
+        String op = ctx.op.getText();
 
         if( leftType != rightType) {
-            throw new CompilerException( "Can only multiply similar values" );
+            throw new CompilerException("Can only multiply or divide values of INT");
+        }
+        if( (leftType != DataType.INT) || (rightType != DataType.INT)) {
+            throw new CompilerException("Expressions not of datatype INT");
+        }
+
+        if ((op != "*") && (op != "/")) {
+            throw new CompilerException("Unknown comparison operator");
         }
 
         types.put( ctx, leftType);
         return leftType;
     }
 
-    /**
-     * Statements
-     */
     @Override
-    public DataType visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
-        return super.visitPrintStatement(ctx);
-    }
-
-    /**
-     * IF Statement
-     */
-
-    @Override
-    public DataType visitConditionalCond(OurLanguageParser.ConditionalCondContext ctx) {
+    public DataType visitLogicalCond(OurLanguageParser.LogicalCondContext ctx) {
         DataType leftType = visit( ctx.left);
         DataType rightType = visit( ctx.right);
+        String comp = ctx.comp.getText();
 
-        if(leftType != rightType) {
-            throw new CompilerException("Can only compare similar values");
+        if( leftType != rightType) {
+            throw new CompilerException("Can only compare values of BOOL");
+        }
+        if( (leftType != DataType.BOOL) || (rightType != DataType.BOOL)) {
+            throw new CompilerException("Expressions not of datatype BOOL");
+        }
+
+        if ((comp != "<") && (comp != ">") && (comp != "<=") && (comp != ">=") && (comp != "==") && (comp != "!=")) {
+            throw new CompilerException("Unknown comparison operator");
         }
 
         types.put(ctx, DataType.BOOL);
@@ -117,10 +133,11 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType leftType = visit(ctx.left);
         DataType rightType = visit(ctx.right);
 
-        if (leftType != rightType) {
-            throw new CompilerException("Conditions not of the type");
-        } else if(leftType != DataType.BOOL) {
-            throw new CompilerException("Condition is not a boolean value");
+        if( leftType != rightType) {
+            throw new CompilerException("Can only compare values of BOOL");
+        }
+        if( (leftType != DataType.BOOL) || (rightType != DataType.BOOL)) {
+            throw new CompilerException("Expressions not of datatype BOOL");
         }
 
         types.put(ctx, leftType);
@@ -132,10 +149,11 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType leftType = visit(ctx.left);
         DataType rightType = visit(ctx.right);
 
-        if (leftType != rightType) {
-            throw new CompilerException("Conditions not of the type");
-        } else if(leftType != DataType.BOOL) {
-            throw new CompilerException("Condition is not a boolean value");
+        if( leftType != rightType) {
+            throw new CompilerException("Can only compare values of BOOL");
+        }
+        if( (leftType != DataType.BOOL) || (rightType != DataType.BOOL)) {
+            throw new CompilerException("Expressions not of datatype BOOL");
         }
 
         types.put(ctx, leftType);
@@ -144,7 +162,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
     @Override
     public DataType visitLogicalNotCond(OurLanguageParser.LogicalNotCondContext ctx) {
-        DataType conditionType = visit(ctx.condition());
+        DataType conditionType = visit(ctx.expression());
         if(conditionType != DataType.BOOL) {
             throw new CompilerException("Condition is not a boolean value");
         }
@@ -153,48 +171,9 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return conditionType;
     }
 
-    @Override
-    public DataType visitLogicalExBool(OurLanguageParser.LogicalExBoolContext ctx) {
-        DataType exprType = visit(ctx.expression());
-
-        if (exprType != DataType.BOOL) {
-            throw new CompilerException("Condition must be of type bool");
-        }
-
-        return exprType;
-    }
-
-    @Override
-    public DataType visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
-
-        ctx.condition().forEach(c -> {
-            DataType conditionType = visit(c);
-            if(conditionType != DataType.BOOL) {
-                throw new CompilerException("Condition is not a boolean");
-            }
-        });
-
-        ctx.block().forEach(b -> {
-            visit(b);
-        });
-
-        return null;
-    }
-
-    @Override
-    public DataType visitBlock(OurLanguageParser.BlockContext ctx) {
-        scope = scope.createChild("Block");
-        for (OurLanguageParser.StatementContext statement : ctx.statement()) {
-            visit(statement);
-        }
-        scope = scope.getParentScope();
-
-        return null;
-    }
-
     /**
-     * Declaration & Assignment
-     */
+     * Statements
+     * */
 
     @Override
     public DataType visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
@@ -270,7 +249,38 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     }
 
     @Override
+    public DataType visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
+
+        ctx.expression().forEach(c -> {
+            DataType conditionType = visit(c);
+            if(conditionType != DataType.BOOL) {
+                throw new CompilerException("Condition is not a boolean");
+            }
+        });
+
+        ctx.block().forEach(b -> {
+            visit(b);
+        });
+
+        return null;
+    }
+
+    @Override
+    public DataType visitBlock(OurLanguageParser.BlockContext ctx) {
+        scope = scope.createChild("Block");
+        for (OurLanguageParser.StatementContext statement : ctx.statement()) {
+            visit(statement);
+        }
+        scope = scope.getParentScope();
+
+        return null;
+    }
+
+    @Override
     public DataType visitWhileLoop(OurLanguageParser.WhileLoopContext ctx) {
-        return super.visitWhileLoop(ctx);
+        scope = scope.createChild("While");
+        visit(ctx.block());
+        scope = scope.getParentScope();
+        return null;
     }
 }
