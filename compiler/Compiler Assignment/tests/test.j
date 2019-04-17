@@ -5,35 +5,28 @@
 .limit stack 99
 .limit locals 99
 
-    ldc 10
     istore 0
     getstatic java/lang/System/out Ljava/io/PrintStream;
     iload 0
     invokevirtual java/io/PrintStream/println(I)V
-    ldc "Hi there"
-    astore 1
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    aload 1
-    invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    while_0:
+    iload 0
+    ldc 4
+    if_icmplt true_condition_0
+    	 ldc 0
+    	 goto end_0
+    true_condition_0:
+    	 ldc 1
+    end_0:
     ldc 1
-    istore 2
+    if_icmpeq true_while_0
+    	 goto end_while_0
+    true_while_0:
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    iload 2
-    invokevirtual java/io/PrintStream/println(Z)V
-    ldc 0
-    istore 3
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    iload 3
-    invokevirtual java/io/PrintStream/println(I)V
-    ldc "Hello"
-    astore 4
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    aload 4
+    ldc "HELLO"
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
-    ldc 0
-    istore 5
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    iload 5
-    invokevirtual java/io/PrintStream/println(Z)V
+    istore 0
+    	goto while_0
+    end_while_0:
     return
 .end method

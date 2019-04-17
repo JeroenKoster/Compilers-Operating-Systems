@@ -86,8 +86,8 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType mathType = checkMathType(visit(ctx.left), visit(ctx.right));
         String op = ctx.op.getText();
 
-        if ((op != "+") && (op != "-")) {
-            throw new CompilerException("Unknown comparison operator");
+        if (!op.equals("+") && !op.equals("-")) {
+            throw new CompilerException("Unknown math operator");
         }
 
         types.put( ctx, mathType);
@@ -99,8 +99,8 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType mathType = checkMathType(visit(ctx.left), visit(ctx.right));
         String op = ctx.op.getText();
 
-        if ((op != "*") && (op != "/")) {
-            throw new CompilerException("Unknown comparison operator");
+        if (!op.equals("*") && !op.equals("/")) {
+            throw new CompilerException("Unknown math operator");
         }
 
         types.put( ctx, mathType);
@@ -232,12 +232,13 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         }
 
         Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
+        symbols.put(ctx, symbol);
 
         DataType expressionType = visit(ctx.expression());
 
         if (symbol != null) {
             if (symbolType != expressionType) {
-                throw new CompilerException("Can not assign value to variable that has not the same type" + symbolType + " " + expressionType );
+                throw new CompilerException("Can not assign value to variable that has not the same type " + symbolType + " " + expressionType );
             }
         } else {
             throw new CompilerException("Can not assign value to " + symbolType );
@@ -270,7 +271,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         DataType exprType = visit(ctx.expression());
 
         if (exprType != DataType.BOOL && exprType != DataType.INT && exprType != DataType.STRING) {
-            throw new CompilerException("Can not print exprssion of this type");
+            throw new CompilerException("Can not print expression of this type");
         }
         return null;
     }
@@ -286,11 +287,11 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return null;
     }
 
-    @Override
-    public DataType visitWhileLoop(OurLanguageParser.WhileLoopContext ctx) {
-        scope = scope.createChild("While");
-        visit(ctx.block());
-        scope = scope.getParentScope();
-        return null;
-    }
+//    @Override
+//    public DataType visitWhileLoop(OurLanguageParser.WhileLoopContext ctx) {
+////        scope = scope.createChild("While");
+//        visit(ctx.block());
+////        scope = scope.getParentScope();
+//        return null;
+//    }
 }

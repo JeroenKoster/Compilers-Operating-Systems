@@ -28,11 +28,25 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIfStatement(OurLanguageParser.IfStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link OurLanguageParser#declaration}.
+	 * Visit a parse tree produced by {@link OurLanguageParser#whileLoop}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclaration(OurLanguageParser.DeclarationContext ctx);
+	T visitWhileLoop(OurLanguageParser.WhileLoopContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeclOnly}
+	 * labeled alternative in {@link OurLanguageParser#declaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DeclAndAssignment}
+	 * labeled alternative in {@link OurLanguageParser#declaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link OurLanguageParser#variableName}.
 	 * @param ctx the parse tree
@@ -58,11 +72,12 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBlock(OurLanguageParser.BlockContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link OurLanguageParser#condition}.
+	 * Visit a parse tree produced by the {@code LogicalOrCond}
+	 * labeled alternative in {@link OurLanguageParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCondition(OurLanguageParser.ConditionContext ctx);
+	T visitLogicalOrCond(OurLanguageParser.LogicalOrCondContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExNegate}
 	 * labeled alternative in {@link OurLanguageParser#expression}.
@@ -85,12 +100,26 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExMulOp(OurLanguageParser.ExMulOpContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code LogicalNotCond}
+	 * labeled alternative in {@link OurLanguageParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicalNotCond(OurLanguageParser.LogicalNotCondContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ExAddOp}
 	 * labeled alternative in {@link OurLanguageParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExAddOp(OurLanguageParser.ExAddOpContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LogicalCond}
+	 * labeled alternative in {@link OurLanguageParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicalCond(OurLanguageParser.LogicalCondContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExBoolLiteral}
 	 * labeled alternative in {@link OurLanguageParser#expression}.
@@ -112,6 +141,13 @@ public interface OurLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExParentheses(OurLanguageParser.ExParenthesesContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LogicalAndCond}
+	 * labeled alternative in {@link OurLanguageParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicalAndCond(OurLanguageParser.LogicalAndCondContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ExStringLiteral}
 	 * labeled alternative in {@link OurLanguageParser#expression}.

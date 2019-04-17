@@ -1,11 +1,9 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Scope {
 
     private Scope parentScope;
     private HashMap<String, Symbol> variables = new HashMap<>();
-    private ArrayList<Scope> childScopes = new ArrayList<>();
 
     private String name;
     private int index;
@@ -41,7 +39,7 @@ public class Scope {
     }
 
     /**
-     * Declaration
+     * Variables
      */
     public Symbol declareVariable(String name, DataType type) {
         int index = variables.size();
@@ -51,8 +49,7 @@ public class Scope {
             variables.put(name, variableSymbol);
             return variableSymbol;
         } else {
-//            throw new CompilerException("Variable " + name + " already exists");
-            return null;
+            throw new ScopeException("Variable " + name + " already exists");
         }
     }
 

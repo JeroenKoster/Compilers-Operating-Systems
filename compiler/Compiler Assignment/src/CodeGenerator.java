@@ -225,8 +225,16 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         ArrayList<String> code = new ArrayList<>();
         Symbol symbol = symbols.get(ctx);
 
-        code.addAll(visit(ctx.expression()));
-        code.add(doAssing(symbol));
+        if (symbol.getType() == DataType.INT) {
+            code.add("istore " + symbol.getIndex());
+        } else if (symbol.getType() == DataType.STRING) {
+           // assingmentString = "astore " + symbol.getIndex();
+        } else if (symbol.getType() == DataType.BOOL) {
+           // assingmentString = "istore " + symbol.getIndex();
+        } else {
+            throw new CompilerException("Can not store variable " + symbol.getName());
+        }
+//        code.add(doAssing(symbol));
 
         return code;
     }
@@ -319,10 +327,12 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.addAll(visit(ctx.expression()));
         code.add("ldc 1");
         code.add("if_icmpeq true_while_" + LOOPCOUNTER);
+//        code.add("\tldc 0");
         code.add("\t goto end_while_" + LOOPCOUNTER);
         code.add("true_while_" + LOOPCOUNTER +":");
+//        code.add("\tldc 1");
         code.addAll(visit(ctx.block()));
-        code.add("goto while_" + LOOPCOUNTER);
+        code.add("\tgoto while_" + LOOPCOUNTER);
         code.add("end_while_" + LOOPCOUNTER + ":");
 
         LOOPCOUNTER++;

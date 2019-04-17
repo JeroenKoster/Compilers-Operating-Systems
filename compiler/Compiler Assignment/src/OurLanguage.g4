@@ -6,7 +6,6 @@ statement
     : printStatement
     | ifStatement
     | whileLoop
-    | forLoop
     | declaration
     | assignment
     | block
@@ -15,8 +14,6 @@ statement
 ifStatement: 'IF' expression block ('ELSE IF' expression block)* ('ELSE' block)?;
 
 whileLoop: 'WHILE' expression block;
-
-forLoop: 'FOR' expression ';' assignment block;
 
 declaration
     : variableName IDENTIFIER ';'                                   # DeclOnly
@@ -52,3 +49,5 @@ BOOLEAN: 'true' | 'false';
 IDENTIFIER: '.'[A-Za-z][A-Za-z_]*;
 WS: [\r\n\t ]+ -> skip;
 COMMENT: '//'.*? [\n\r]+ -> skip;
+//INVALID_TXT: [A-Za-z]*[A-Za-z];
+//INVALID_NR: '0'[1-9][0-9]*;
