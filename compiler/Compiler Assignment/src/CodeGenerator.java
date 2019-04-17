@@ -1,6 +1,4 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -27,7 +25,6 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         code.add("return");
         return code;
     }
-
 
     /**
      * Expressions
@@ -124,72 +121,6 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         return code;
     }
 
-    /**
-     * Statements
-     */
-
-    @Override
-    public ArrayList<String> visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
-        ArrayList<String> code = new ArrayList<>();
-        return code;
-    }
-
-    @Override
-    public ArrayList<String> visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
-        ArrayList<String> code = new ArrayList<>();
-        Symbol symbol = symbols.get(ctx);
-
-        code.addAll(visit(ctx.expression()));
-        code.add(assignment(symbol));
-
-        return code;
-    }
-
-    private String assignment(Symbol symbol) {
-        String assingmentString;
-
-        if (symbol.getType() == DataType.INT) {
-            assingmentString = "istore " + symbol.getIndex();
-        } else if (symbol.getType() == DataType.STRING) {
-            assingmentString = "astore " + symbol.getIndex();
-        } else if (symbol.getType() == DataType.BOOL) {
-            assingmentString = "istore " + symbol.getIndex();
-        } else {
-            throw new CompilerException("Can not store variable " + symbol.getName());
-        }
-
-        return assingmentString;
-    }
-
-    @Override
-    public ArrayList<String> visitAssignment(OurLanguageParser.AssignmentContext ctx) {
-        ArrayList<String> code = new ArrayList<>();
-        Symbol symbol = symbols.get(ctx);
-
-        code.addAll(visit(ctx.expression()));
-        code.add(assignment(symbol));
-
-        return code;
-    }
-
-    @Override
-    public ArrayList<String> visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
-        ArrayList<String> code = new ArrayList<>();
-
-        code.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
-        code.addAll( visit(ctx.expression()) );
-
-        if( types.get(ctx.expression()) == DataType.INT)
-            code.add("invokevirtual java/io/PrintStream/println(I)V");
-        else if( types.get(ctx.expression()) == DataType.STRING )
-            code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
-        else if (types.get(ctx.expression()) == DataType.BOOL)
-            code.add("invokevirtual java/io/PrintStream/println(Z)V");
-        else
-            code.add("; Oops... should have a println()-call here...");
-        return code;
-    }
-
     @Override
     public ArrayList<String> visitLogicalCond(OurLanguageParser.LogicalCondContext ctx) {
         ArrayList<String> code = new ArrayList<>();
@@ -219,10 +150,8 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
                 assert false;
         }
 
-        // if false returns ldc 0 and goto end
         code.add("\t ldc 0");
         code.add("\t goto end_" + LABELCOUNTER);
-        // if true returns ldc 1
         code.add("true_condition_" + LABELCOUNTER + ":");
         code.add("\t ldc 1");
         code.add("end_" + LABELCOUNTER + ":");
@@ -266,9 +195,59 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     }
 
     /**
-     * Statements
+     * Statements - Declaration
      */
 
+    @Override
+    public ArrayList<String> visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        return code;
+    }
+
+    private String doAssing(Symbol symbol) {
+        String assingmentString;
+
+        if (symbol.getType() == DataType.INT) {
+            assingmentString = "istore " + symbol.getIndex();
+        } else if (symbol.getType() == DataType.STRING) {
+            assingmentString = "astore " + symbol.getIndex();
+        } else if (symbol.getType() == DataType.BOOL) {
+            assingmentString = "istore " + symbol.getIndex();
+        } else {
+            throw new CompilerException("Can not store variable " + symbol.getName());
+        }
+
+        return assingmentString;
+    }
+
+    @Override
+    public ArrayList<String> visitAssignment(OurLanguageParser.AssignmentContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        Symbol symbol = symbols.get(ctx);
+
+        code.addAll(visit(ctx.expression()));
+        code.add(doAssing(symbol));
+
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+        // Nothing to return needed for declaration, so start at assignment
+        // Since we are in a different context than "visitAssignment" we do
+        // need a seperate visit method for declaring and assignment at the same time.
+        Symbol symbol = symbols.get(ctx);
+
+        code.addAll(visit(ctx.expression()));
+        code.add(doAssing(symbol));
+
+        return code;
+    }
+
+    /**
+     * Statements - General
+     */
 
     @Override
     public ArrayList<String> visitIfStatement(OurLanguageParser.IfStatementContext ctx) {
@@ -283,21 +262,38 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         }
         code.add("\t ldc 0");
         // If there are more blocks than conditions, an else block exists
-        // There is probably a nicer way to do this check
         if (ctx.block().size() > ctx.expression().size()) {
             code.addAll(visit(ctx.block(ctx.block().size() - 1))); // If we reach this, none of the if- or elseIf-conditions was true
         }
-        code.add("\t goto end_" + LABELCOUNTER); // Skip all the ifBlocks
+        code.add("\t goto end_if_" + LABELCOUNTER); // Skip all the ifBlocks
 
         for (int i = 0; i < ctx.expression().size(); i++) { // Add blocks for each if / if-else statement
             code.add("true_if_" + i + "_" + LABELCOUNTER + ":");
             code.add("\t ldc 1");
             code.addAll(visit(ctx.block(i)));
-            code.add("\t goto end_" + LABELCOUNTER); // Skip all the remaining ifBlocks
+            code.add("\t goto end_if_" + LABELCOUNTER); // Skip all the remaining ifBlocks
         }
-        code.add("end_" + LABELCOUNTER + ":");
+        code.add("end_if_" + LABELCOUNTER + ":");
         LABELCOUNTER++;
 
+        return code;
+    }
+
+    @Override
+    public ArrayList<String> visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
+        ArrayList<String> code = new ArrayList<>();
+
+        code.add("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        code.addAll( visit(ctx.expression()) );
+
+        if( types.get(ctx.expression()) == DataType.INT)
+            code.add("invokevirtual java/io/PrintStream/println(I)V");
+        else if( types.get(ctx.expression()) == DataType.STRING )
+            code.add("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        else if (types.get(ctx.expression()) == DataType.BOOL)
+            code.add("invokevirtual java/io/PrintStream/println(Z)V");
+        else
+            assert false;
         return code;
     }
 
@@ -312,7 +308,7 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
     }
 
     /**
-     * Loops
+     * Statements - Loops
      */
 
     @Override
@@ -332,17 +328,5 @@ public class CodeGenerator extends OurLanguageBaseVisitor< ArrayList<String> > {
         LOOPCOUNTER++;
 
         return code;
-    }
-
-    @Override
-    public ArrayList<String> visitForLoop(OurLanguageParser.ForLoopContext ctx) {
-        ArrayList<String> code = new ArrayList<>();
-
-        code.add("for_" + LOOPCOUNTER + ":");
-        code.addAll(visit(ctx.expression()));
-        code.addAll(visit(ctx.assignment()));
-
-
-        return super.visitForLoop(ctx);
     }
 }

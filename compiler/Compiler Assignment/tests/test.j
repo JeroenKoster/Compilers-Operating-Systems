@@ -5,59 +5,35 @@
 .limit stack 99
 .limit locals 99
 
+    ldc 10
+    istore 0
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 1
-    ldc 2
-    iadd
+    iload 0
     invokevirtual java/io/PrintStream/println(I)V
+    ldc "Hi there"
+    astore 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 4
-    ldc 5
-    imul
-    ldc 3
-    isub
-    invokevirtual java/io/PrintStream/println(I)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "Hi"
+    aload 1
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 6
-    ldc 2
-    isub
-    invokevirtual java/io/PrintStream/println(I)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 2
-    ineg
-    ldc 4
-    ldc 5
-    imul
-    iadd
-    invokevirtual java/io/PrintStream/println(I)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 2
-    ineg
-    ldc 4
-    ldc 6
     ldc 1
-    isub
-    imul
-    iadd
-    ldc 9
-    idiv
-    invokevirtual java/io/PrintStream/println(I)V
+    istore 2
     getstatic java/lang/System/out Ljava/io/PrintStream;
+    iload 2
+    invokevirtual java/io/PrintStream/println(Z)V
+    ldc 0
+    istore 3
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    iload 3
+    invokevirtual java/io/PrintStream/println(I)V
     ldc "Hello"
+    astore 4
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    aload 4
     invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+    ldc 0
+    istore 5
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 6
-    ldc 2
-    idiv
-    invokevirtual java/io/PrintStream/println(I)V
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc 4
-    ineg
-    ldc 8
-    isub
-    invokevirtual java/io/PrintStream/println(I)V
+    iload 5
+    invokevirtual java/io/PrintStream/println(Z)V
     return
 .end method

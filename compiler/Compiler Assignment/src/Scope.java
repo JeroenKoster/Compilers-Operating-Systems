@@ -33,6 +33,7 @@ public class Scope {
     }
 
     public Scope getGlobalParent() {
+        // Could be implemented later
         if (parentScope != null) {
             return parentScope.getGlobalParent();
         }

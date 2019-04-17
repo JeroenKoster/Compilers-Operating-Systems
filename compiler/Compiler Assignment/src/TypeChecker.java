@@ -1,7 +1,8 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
+/**
+ * TypeChecker for OurLanguage.
+ */
 
 public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
     private ParseTreeProperty<DataType> types = new ParseTreeProperty<>();
@@ -50,10 +51,10 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         Symbol symbol = scope.findVariable(name);
 
         if(symbol == null) {
-            throw new CompilerException("Unknown variable");
+            throw new CompilerException("Unknown variable, does not exist in this scope");
         }
         if((symbol.getType() != DataType.INT) && (symbol.getType() != DataType.STRING) && (symbol.getType() != DataType.BOOL)) {
-            throw new CompilerException("Unknown datatype " + symbol.getType());
+            throw new CompilerException("Unknown variable with this datatype " + symbol.getType());
         }
 
         symbols.put(ctx, symbol);
@@ -70,41 +71,40 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return exprType;
     }
 
-    @Override
-    public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
-        DataType leftType = visit( ctx.left);
-        DataType rightType = visit( ctx.right);
-
+    private DataType checkMathType(DataType leftType, DataType rightType) {
         if( leftType != rightType) {
-            throw new CompilerException("Can only add or subtract values of INT");
+            throw new CompilerException("Can only do math operation on values of INT");
         }
         if( (leftType != DataType.INT) || (rightType != DataType.INT)) {
             throw new CompilerException("Expressions not of datatype INT");
         }
-
-        types.put( ctx, leftType);
         return leftType;
     }
 
     @Override
-    public DataType visitExMulOp(OurLanguageParser.ExMulOpContext ctx) {
-        DataType leftType = visit( ctx.left);
-        DataType rightType = visit( ctx.right);
+    public DataType visitExAddOp(OurLanguageParser.ExAddOpContext ctx) {
+        DataType mathType = checkMathType(visit(ctx.left), visit(ctx.right));
         String op = ctx.op.getText();
 
-        if( leftType != rightType) {
-            throw new CompilerException("Can only multiply or divide values of INT");
+        if ((op != "+") && (op != "-")) {
+            throw new CompilerException("Unknown comparison operator");
         }
-        if( (leftType != DataType.INT) || (rightType != DataType.INT)) {
-            throw new CompilerException("Expressions not of datatype INT");
-        }
+
+        types.put( ctx, mathType);
+        return mathType;
+    }
+
+    @Override
+    public DataType visitExMulOp(OurLanguageParser.ExMulOpContext ctx) {
+        DataType mathType = checkMathType(visit(ctx.left), visit(ctx.right));
+        String op = ctx.op.getText();
 
         if ((op != "*") && (op != "/")) {
             throw new CompilerException("Unknown comparison operator");
         }
 
-        types.put( ctx, leftType);
-        return leftType;
+        types.put( ctx, mathType);
+        return mathType;
     }
 
     @Override
@@ -116,11 +116,8 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         if( leftType != rightType) {
             throw new CompilerException("Can only compare values of BOOL");
         }
-        if( (leftType != DataType.BOOL) || (rightType != DataType.BOOL)) {
-            throw new CompilerException("Expressions not of datatype BOOL");
-        }
 
-        if ((comp != "<") && (comp != ">") && (comp != "<=") && (comp != ">=") && (comp != "==") && (comp != "!=")) {
+        if (!(comp.equals(">") || comp.equals("<") || comp.equals(">=") || comp.equals("<=") || comp.equals("==") || comp.equals("!="))) {
             throw new CompilerException("Unknown comparison operator");
         }
 
@@ -128,10 +125,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         return DataType.BOOL;
     }
 
-    @Override
-    public DataType visitLogicalOrCond(OurLanguageParser.LogicalOrCondContext ctx) {
-        DataType leftType = visit(ctx.left);
-        DataType rightType = visit(ctx.right);
+    private DataType checkLogicType(DataType leftType, DataType rightType) {
 
         if( leftType != rightType) {
             throw new CompilerException("Can only compare values of BOOL");
@@ -140,24 +134,23 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
             throw new CompilerException("Expressions not of datatype BOOL");
         }
 
-        types.put(ctx, leftType);
         return leftType;
     }
 
     @Override
+    public DataType visitLogicalOrCond(OurLanguageParser.LogicalOrCondContext ctx) {
+        DataType logicalType = checkLogicType(visit(ctx.left), visit(ctx.right));
+
+        types.put(ctx, logicalType);
+        return logicalType;
+    }
+
+    @Override
     public DataType visitLogicalAndCond(OurLanguageParser.LogicalAndCondContext ctx) {
-        DataType leftType = visit(ctx.left);
-        DataType rightType = visit(ctx.right);
+        DataType logicalType = checkLogicType(visit(ctx.left), visit(ctx.right));
 
-        if( leftType != rightType) {
-            throw new CompilerException("Can only compare values of BOOL");
-        }
-        if( (leftType != DataType.BOOL) || (rightType != DataType.BOOL)) {
-            throw new CompilerException("Expressions not of datatype BOOL");
-        }
-
-        types.put(ctx, leftType);
-        return leftType;
+        types.put(ctx, logicalType);
+        return logicalType;
     }
 
     @Override
@@ -175,53 +168,35 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
      * Statements
      * */
 
-    @Override
-    public DataType visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
+    private DataType checkSymbolType(String variableName) {
         DataType symbolType = null;
 
-        if (ctx.variableName().getText().equals("INT")) {
+        if (variableName.equals("INT")) {
             symbolType = DataType.INT;
-        } else if (ctx.variableName().getText().equals("STRING")) {
+        } else if (variableName.equals("STRING")) {
             symbolType = DataType.STRING;
-        } else if (ctx.variableName().getText().equals("BOOL")) {
+        } else if (variableName.equals("BOOL")) {
             symbolType = DataType.BOOL;
         } else {
             throw new CompilerException("Invalid declaration type");
         }
 
-        Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
-        symbols.put(ctx, symbol);
+        if(symbolType == null) {
+            throw new CompilerException("Declaration symbol is null, not a valid datatype");
+        }
 
-        return null;
+        return symbolType;
     }
 
     @Override
-    public DataType visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
-        DataType symbolType = null;
+    public DataType visitDeclOnly(OurLanguageParser.DeclOnlyContext ctx) {
+        DataType symbolType = checkSymbolType(ctx.variableName().getText());
 
-        if (ctx.variableName().getText().equals("INT")) {
-            symbolType = DataType.INT;
-        } else if (ctx.variableName().getText().equals("STRING")) {
-            symbolType = DataType.STRING;
-        } else if (ctx.variableName().getText().equals("BOOL")) {
-            symbolType = DataType.BOOL;
-        } else {
-            throw new CompilerException("Invalid declaration type");
+        if(symbolType == null) {
+            throw new CompilerException("Declaration symbol is null, not a valid datatype");
         }
 
         Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
-        symbols.put(ctx, symbol);
-
-        DataType expressionType = visit(ctx.expression()); // ldc 0 of ldc 1
-
-        if (symbol != null) {
-            if (symbolType != expressionType) {
-                throw new CompilerException("Can not assign value to variable that has not the same type" + symbolType + " " + expressionType );
-            }
-        } else {
-            throw new CompilerException("Can not assign value to " + symbolType );
-        }
-
         symbols.put(ctx, symbol);
 
         return null;
@@ -233,7 +208,7 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
         Symbol symbol = scope.findVariable(variableName);
 
         DataType variableType = symbol.getType();
-        DataType expressionType = visit(ctx.expression()); // ldc 0 of ldc 1
+        DataType expressionType = visit(ctx.expression());
 
         if (symbol != null) {
             if (variableType != expressionType) {
@@ -241,6 +216,31 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
             }
         } else {
             throw new CompilerException("Can not assign value to " + variableName );
+        }
+
+        symbols.put(ctx, symbol);
+
+        return null;
+    }
+
+    @Override
+    public DataType visitDeclAndAssignment(OurLanguageParser.DeclAndAssignmentContext ctx) {
+        DataType symbolType = checkSymbolType(ctx.variableName().getText());
+
+        if(symbolType == null) {
+            throw new CompilerException("Declaration symbol is null, not a valid datatype");
+        }
+
+        Symbol symbol = scope.declareVariable(ctx.IDENTIFIER().getText(), symbolType);
+
+        DataType expressionType = visit(ctx.expression());
+
+        if (symbol != null) {
+            if (symbolType != expressionType) {
+                throw new CompilerException("Can not assign value to variable that has not the same type" + symbolType + " " + expressionType );
+            }
+        } else {
+            throw new CompilerException("Can not assign value to " + symbolType );
         }
 
         symbols.put(ctx, symbol);
@@ -262,6 +262,16 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
             visit(b);
         });
 
+        return null;
+    }
+
+    @Override
+    public DataType visitPrintStatement(OurLanguageParser.PrintStatementContext ctx) {
+        DataType exprType = visit(ctx.expression());
+
+        if (exprType != DataType.BOOL && exprType != DataType.INT && exprType != DataType.STRING) {
+            throw new CompilerException("Can not print exprssion of this type");
+        }
         return null;
     }
 
