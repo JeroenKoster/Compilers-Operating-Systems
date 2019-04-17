@@ -1,4 +1,4 @@
-// This test will show a valid example
+// This test will show a invalid example
 // While loop
 
 INT .a;
@@ -7,5 +7,5 @@ PRINT .a;
 
 WHILE .a < 4 {
     PRINT "HELLO";
-    .a = .a + 1 ;
+    .a = .a + 1;
 }

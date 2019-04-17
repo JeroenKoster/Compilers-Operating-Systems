@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Compiles source code in a custom language into Jasmin and then assembles a
  * JVM-compatible .class file.
  *
- * Check the TODO's.
+ * Nicky ter Maat & Jeroen Koster
  */
 public class Compiler {
     private TypeChecker checker;
@@ -98,7 +98,7 @@ public class Compiler {
      * @return       A steam of tokens.
      */
     private CommonTokenStream runLexer( CharStream input ) {
-        OurLanguageLexer lexer = new OurLanguageLexer(input);  // TODO: Replace lexer with the one for your own language
+        OurLanguageLexer lexer = new OurLanguageLexer(input);
         lexer.addErrorListener(getErrorListener());
         return new CommonTokenStream(lexer);
     }
@@ -110,9 +110,9 @@ public class Compiler {
      * @return        A Parse Tree.
      */
     private ParseTree runParser( CommonTokenStream tokens ) {
-        OurLanguageParser parser = new OurLanguageParser(tokens);  // TODO: Replace parser with the one for your own language
+        OurLanguageParser parser = new OurLanguageParser(tokens);
         parser.addErrorListener(getErrorListener());
-        return parser.start();       // TODO: Replace .program() with your own start symbol
+        return parser.start();
     }
 
     /**
@@ -123,15 +123,6 @@ public class Compiler {
      * @return           True if all code is semantically correct
      */
     private boolean runChecker( ParseTree parseTree ) {
-
-        // TODO: Create your own checker that inherits from a BaseVisitor, e.g. ExampleLangBaseVisitor.
-        //       Call the visit() method with the parseTree as parameter. In that visitor, you check for
-        //       errors in the source code. Examples of errors you may want to check for:
-        //         - A variable is used before it was declared
-        //         - The user is trying to assign a value to a variable with a different type
-        //         - An if-statement has a condition that is not a boolean
-        //         - An expression mixes values of incompatible data types
-
         checker = new TypeChecker();
         checker.visit(parseTree);
 
@@ -148,12 +139,6 @@ public class Compiler {
     private String generateCode( ParseTree parseTree ) {
         StringWriter str = new StringWriter();
         PrintWriter out = new PrintWriter(str);
-
-        // TODO: You will have to create a visitor that visits the parse tree and generates
-        //       code for the nodes in that tree.
-        //       In your case, you will probably want to supply that visitor with the PrintWriter
-        //       created above and emit lines of Jasmin code for the nodes in the parse tree.
-        //       For now, I'll just create a simple template that prints 'Hello world!'
 
         CodeGenerator codeGenerator = new CodeGenerator(checker.getTypes(), checker.getSymbols());
         ArrayList<String> code = codeGenerator.visit(parseTree);
@@ -257,7 +242,6 @@ public class Compiler {
             }
         }
         catch( IOException | AssembleException e ) {
-            // TODO: Better error handling? ;-)
             e.printStackTrace();
         }
     }
