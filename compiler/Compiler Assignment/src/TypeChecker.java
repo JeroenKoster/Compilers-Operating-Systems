@@ -286,12 +286,4 @@ public class TypeChecker extends OurLanguageBaseVisitor<DataType> {
 
         return null;
     }
-
-//    @Override
-//    public DataType visitWhileLoop(OurLanguageParser.WhileLoopContext ctx) {
-////        scope = scope.createChild("While");
-//        visit(ctx.block());
-////        scope = scope.getParentScope();
-//        return null;
-//    }
 }
